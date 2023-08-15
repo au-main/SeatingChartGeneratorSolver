@@ -130,6 +130,8 @@ public class Student {
 
     public double matchScoreWith(Student other) {
         double penalty = 0;
+        if (other == null) return 0;
+
         double experienceCompare = this.compareExperience(other);
         if (experienceCompare > 0 && !this.wantsLess) penalty += WORK_WITH_LESS_PENALTY;
         if (experienceCompare == 0 && !this.wantsSame) penalty += WORK_WITH_SAME_PENALTY;

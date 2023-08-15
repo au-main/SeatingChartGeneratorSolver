@@ -1,6 +1,7 @@
 import processing.core.PApplet;
 
 public class DisplayBox {
+    private static final float MAX_PENALTY = 6;
     private int x, y, w, h;
     private DeskPair desk;
 
@@ -48,9 +49,13 @@ public class DisplayBox {
         return getName1() + " and " + getName2();
     }
 
-    public void draw(PApplet window) {
+    public void draw(PApplet window, boolean shadeConstraintViolations) {
         window.fill(255);
         window.stroke(255);
+        if (shadeConstraintViolations) {
+            float val = 255*window.map((float)desk.getPenalty(), 0 , MAX_PENALTY, 0, 1);
+            window.fill(255, 255-val, 255-val );
+        }
         window.rect(x, y, w, h);
         window.fill(0);
         window.textAlign(window.LEFT, window.TOP);

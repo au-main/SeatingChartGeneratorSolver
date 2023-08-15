@@ -7,6 +7,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+/*
+TODO:   - make a separate program for generating chart
+        - re-write main so we can load charts from file or save them to file
+        - on hover or click display student info side by side so I can inspect / see constraint violations
+        - let me unassign + manually re-assign students
+        - let me randomly generate possibilities after I hand-fix some pairs
+
+        - make improved search --> greedy assignment w/ backtracking?
+        - make improved search --> particle filter?
+ */
+
 public class Main extends PApplet {
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
@@ -108,7 +119,7 @@ public class Main extends PApplet {
         background(255);
 
         for (DisplayBox box : displayList) {
-            box.draw(this);
+            box.draw(this, true);
 
             if (box.isMouseOver(mouseX, mouseY)) {
                 box.highlight(this);
