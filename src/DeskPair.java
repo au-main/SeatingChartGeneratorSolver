@@ -10,6 +10,12 @@ public class DeskPair {
         this.right = right;
     }
 
+    public DeskPair(DeskPair toCopy) {
+        this.id = toCopy.id;
+        this.left = toCopy.left;
+        this.right = toCopy.right;
+    }
+
     public DeskPair(Student left, Student right, SeatingChart chart) {
         this.id = nextId++;
         this.left = left;
@@ -127,5 +133,9 @@ public class DeskPair {
         }
 
         return penalty;
+    }
+
+    public void setChart(SeatingChart seatingChart) {
+        this.chart = seatingChart;
     }
 }

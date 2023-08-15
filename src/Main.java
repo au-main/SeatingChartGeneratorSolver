@@ -4,19 +4,25 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class Main extends PApplet {
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
     private static final int LIST_DISPLAY = 0;
+    private static final int NUM_TO_CHECK = 5000000;
+    private static final int NUM_TO_KEEP = 10;
 
     SeatingChart chart = new SeatingChart();
+    ArrayList<SeatingChart> charts = new ArrayList<>();
     ArrayList<DisplayBox> displayList = new ArrayList<DisplayBox>();
     float verticalBuffer = 10;
     float horizBuffer = 10;
     float textHeight, boxHeight;
     int numNamesPerCol, numColumns;
     int columnWidth;
+    int indexToDisplay = 0;
 
     int displayMode = LIST_DISPLAY;
     private String file = "sampleData.csv";
@@ -46,6 +52,18 @@ public class Main extends PApplet {
         columnWidth = width / numColumns;
 
         chart.assignRandomly();
+
+        System.out.println("Generating great chart!");
+        for (int i = 0; i < NUM_TO_CHECK; i++) {
+            SeatingChart next = new SeatingChart(chart);
+            next.assignRandomly();
+
+            charts.add(next);
+            Collections.sort(charts, Comparator.comparingDouble(SeatingChart::getScore));
+            if (charts.size() > NUM_TO_KEEP) charts.remove(charts.size()-1);
+        }
+
+        this.chart = charts.get(indexToDisplay);
         displayList = makeDisplayListFor(chart);
     }
 
@@ -96,11 +114,30 @@ public class Main extends PApplet {
                 box.highlight(this);
             }
         }
+
+        String scoreDisplay = "Score: " + this.chart.getScore();
+        text(scoreDisplay, 500, 30);
     }
 
     public void keyReleased() {
         if (key == 'r' || key == 'R') {
             reshuffle();
+        }
+
+        if (key == CODED && keyCode == UP) {
+            indexToDisplay--;
+            if (indexToDisplay < 0) indexToDisplay = charts.size() - 1;
+
+            this.chart = charts.get(indexToDisplay);
+            displayList = makeDisplayListFor(chart);
+        }
+
+        if (key == CODED && keyCode == DOWN) {
+            indexToDisplay++;
+            if (indexToDisplay >= charts.size()) indexToDisplay = 0;
+
+            this.chart = charts.get(indexToDisplay);
+            displayList = makeDisplayListFor(chart);
         }
     }
 

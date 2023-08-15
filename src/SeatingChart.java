@@ -11,12 +11,21 @@ public class SeatingChart {
     }
 
     public SeatingChart(ArrayList<Student> students) {
-        for (Student s : students) {
-            this.students.add(s);
-        }
+        this.students.addAll(students);
 
-        for (int i = 0; i < this.students.size()/2 + 1; i++) {
-            desks.add( new DeskPair(null, null, this) );
+        for (int i = 0; i < this.students.size() / 2 + 1; i++) {
+            desks.add(new DeskPair(null, null, this));
+        }
+    }
+
+    public SeatingChart(SeatingChart toCopy) {
+        students = new ArrayList<>();
+        desks = new ArrayList<>();
+        students.addAll(toCopy.students);
+        for (DeskPair desk : toCopy.desks) {
+            DeskPair copy = new DeskPair(desk);
+            copy.setChart(this);
+            this.desks.add(copy);
         }
     }
 
@@ -30,14 +39,14 @@ public class SeatingChart {
 
     public void addStudent(Student s) {
         this.students.add(s);
-        if (desks.size()*2 < students.size()) {
-            desks.add( new DeskPair(s, null, this) );
+        if (desks.size() * 2 < students.size()) {
+            desks.add(new DeskPair(s, null, this));
         } else {
             DeskPair desk = findDeskWithSpace();
             if (desk != null) {
                 desk.setEmptySeatTo(s);
             } else {
-                desks.add( new DeskPair(s, null, this) );
+                desks.add(new DeskPair(s, null, this));
             }
         }
     }
@@ -70,9 +79,9 @@ public class SeatingChart {
         Collections.shuffle(this.students);
         for (int i = 0; i < students.size(); i += 2) {
             Student s1 = students.get(i);
-            Student s2 =  (i+1 < students.size()) ? students.get(i+1) : null;
+            Student s2 = (i + 1 < students.size()) ? students.get(i + 1) : null;
 
-            DeskPair desk = desks.get(i/2);
+            DeskPair desk = desks.get(i / 2);
             desk.clear();
             desk.setLeft(s1);
             desk.setRight(s2);
@@ -97,9 +106,9 @@ public class SeatingChart {
 
         for (int i = 0; i < desksWithEmpty.size(); i += 2) {
             DeskPair d1 = desksWithEmpty.get(i);
-            DeskPair d2 = desksWithEmpty.get(i+1);
+            DeskPair d2 = desksWithEmpty.get(i + 1);
 
-            Student s = (d2.getRight() == null?d2.removeLeft():d2.removeRight());
+            Student s = (d2.getRight() == null ? d2.removeLeft() : d2.removeRight());
             if (d1.getLeft() == null) {
                 d1.setLeft(s);
             } else {
@@ -122,5 +131,9 @@ public class SeatingChart {
             penalty += desk.getPenalty();
         }
         return penalty;
+    }
+
+    public String toString() {
+        return "Score: " + this.getScore() + " : " + this.desks;
     }
 }
