@@ -62,11 +62,11 @@ public class Student {
 
     private static double getValFor(String grade) {
         grade = grade.trim().toLowerCase();
-        if (grade.equals("a")) return 4;
-        if (grade.equals("b")) return 3;
-        if (grade.equals("c")) return 2;
-        if (grade.equals("d")) return 1;
-        if (grade.equals("f")) return 0;
+        if (grade.equals('a')) return 4;
+        if (grade.equals('b')) return 3;
+        if (grade.equals('c')) return 2;
+        if (grade.equals('d')) return 1;
+        if (grade.equals('f')) return 0;
         return 0;
     }
 
