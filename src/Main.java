@@ -22,12 +22,13 @@ public class Main extends PApplet {
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
     private static final int LIST_DISPLAY = 0;
-    private static final int NUM_TO_CHECK = 5000000;
+    private static final int NUM_TO_CHECK = 500000;
     private static final int NUM_TO_KEEP = 10;
 
     SeatingChart chart = new SeatingChart();
     ArrayList<SeatingChart> charts = new ArrayList<>();
     ArrayList<DisplayBox> displayList = new ArrayList<DisplayBox>();
+    boolean displayConflicts = false;
     float verticalBuffer = 10;
     float horizBuffer = 10;
     float textHeight, boxHeight;
@@ -118,8 +119,11 @@ public class Main extends PApplet {
     public void draw() {
         background(255);
 
+        text("Left Seat   and   Right Seat", displayList.get(0).getX(), 30);
+        text("Left Seat   and   Right Seat", 500 + displayList.get(0).getX(), 30);
+
         for (DisplayBox box : displayList) {
-            box.draw(this, true);
+            box.draw(this, displayConflicts);
 
             if (box.isMouseOver(mouseX, mouseY)) {
                 box.highlight(this);
@@ -127,12 +131,16 @@ public class Main extends PApplet {
         }
 
         String scoreDisplay = "Score: " + this.chart.getScore();
-        text(scoreDisplay, 500, 30);
+        text(scoreDisplay, 500, height - 45);
     }
 
     public void keyReleased() {
         if (key == 'r' || key == 'R') {
             reshuffle();
+        }
+
+        if (key == 'd' || key == 'D') {
+            displayConflicts = !displayConflicts;
         }
 
         if (key == CODED && keyCode == UP) {

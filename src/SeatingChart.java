@@ -206,6 +206,10 @@ public class SeatingChart {
         System.out.println(most.getDisplayName() + ": min" + most.getMin() + " median: " + most.getMedian() + " max: " + most.getMax());
     }
 
+    public void saveChartToFile(String filename) {
+
+    }
+
     public String toString() {
         return "Score: " + this.getScore() + " : " + this.desks;
     }

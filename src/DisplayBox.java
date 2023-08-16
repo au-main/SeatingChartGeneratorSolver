@@ -2,6 +2,9 @@ import processing.core.PApplet;
 
 public class DisplayBox {
     private static final float MAX_PENALTY = 6;
+    public static final int LEFT_COLOR = 0xFF5D3FD3;
+    public static final int RIGHT_COLOR = 0xFFEEBC1D;
+
     private int x, y, w, h;
     private DeskPair desk;
 
@@ -59,7 +62,23 @@ public class DisplayBox {
         window.rect(x, y, w, h);
         window.fill(0);
         window.textAlign(window.LEFT, window.TOP);
-        window.text(getText(), x, y);
+
+        window.fill( LEFT_COLOR );
+        window.stroke( LEFT_COLOR );
+        window.text(getName1() + " ", x, y);
+        float nextX = x + window.textWidth(this.getName1() + " ");
+
+        window.fill( 0 );
+        window.stroke( 0 );
+        window.text("and ", nextX, y);
+
+        nextX = nextX + window.textWidth("and ");
+        window.fill( RIGHT_COLOR );
+        window.fill( RIGHT_COLOR );
+        window.text(getName2(), nextX, y);
+
+        window.fill( 0 );
+        window.stroke( 0 );
     }
 
     public String getName1() {
