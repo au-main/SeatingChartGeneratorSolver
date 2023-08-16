@@ -126,10 +126,10 @@ public class DeskPair {
     public double getPenalty() {
         double penalty = 0;
         if (getLeft() != null) {
-            penalty += getLeft().matchScoreWith(getRight());
+            penalty += getLeft().getMatchScoreFor(getRight());
         }
         if (getRight() != null) {
-            penalty += getRight().matchScoreWith(getLeft());
+            penalty += getRight().getMatchScoreFor(getLeft());
         }
 
         return penalty;

@@ -1,8 +1,3 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import com.sun.org.apache.xpath.internal.operations.Equals;
-
-import java.util.Locale;
-
 public class Student {
     private static final double LARGE_EXP_DIFF_THRESHOLD = 2;
     private static final double WORK_WITH_LESS_PENALTY = 1;
@@ -18,6 +13,8 @@ public class Student {
     private double experienceLevel;
     private boolean wantsSame, wantsMore, wantsLess;
     private boolean likesSolo, likeCollab;
+
+    private double min, max, mean, median, stdev;
 
     public Student(int id, String fn, String ln, String displayName, int gender, double experienceLevel, boolean same, boolean more, boolean less, boolean solo, boolean collab) {
         this.wantsLess = less;
@@ -128,7 +125,7 @@ public class Student {
         return displayName + ": " + this.experienceLevel;
     }
 
-    public double matchScoreWith(Student other) {
+    public double getMatchScoreFor(Student other) {
         double penalty = 0;
         if (other == null) return 0;
 
@@ -148,5 +145,45 @@ public class Student {
 
     private double compareExperience(Student other) {
         return this.getExperienceLevel() - other.getExperienceLevel();
+    }
+
+    public double getMin() {
+        return min;
+    }
+
+    public void setMin(double min) {
+        this.min = min;
+    }
+
+    public double getMax() {
+        return max;
+    }
+
+    public void setMax(double max) {
+        this.max = max;
+    }
+
+    public double getMean() {
+        return mean;
+    }
+
+    public void setMean(double mean) {
+        this.mean = mean;
+    }
+
+    public double getMedian() {
+        return median;
+    }
+
+    public void setMedian(double median) {
+        this.median = median;
+    }
+
+    public double getStdev() {
+        return stdev;
+    }
+
+    public void setStdev(double stdev) {
+        this.stdev = stdev;
     }
 }

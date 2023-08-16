@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class SeatingChart {
     private ArrayList<DeskPair> desks;
@@ -131,6 +133,77 @@ public class SeatingChart {
             penalty += desk.getPenalty();
         }
         return penalty;
+    }
+
+    /***
+     * Genereate mean, median, min and max penalties for
+     * @param student
+     * @return array containing [ min, max, mean, median, standard devation ].
+     */
+    public void assignPenaltyStatsTo(Student student) {
+        List<Double> penalties = getPenaltyListFor(student);
+
+        double minimum = Collections.min(penalties);
+        double maximum = Collections.max(penalties);
+
+        double sum = 0;
+        for (double value : penalties) {
+            sum += value;
+        }
+        double mean = sum / penalties.size();
+
+        Collections.sort(penalties);
+        int size = penalties.size();
+        double median;
+        if (size % 2 == 0) {
+            int middle = size / 2;
+            double median1 = penalties.get(middle - 1);
+            double median2 = penalties.get(middle);
+            median = (median1 + median2) / 2;
+        } else {
+            median = penalties.get(size / 2);
+        }
+
+        double sumOfSquaredDifferences = 0;
+        for (double value : penalties) {
+            double diff = value - mean;
+            sumOfSquaredDifferences += diff * diff;
+        }
+        double variance = sumOfSquaredDifferences / penalties.size();
+        double standardDeviation = Math.sqrt(variance);
+
+        student.setMax(maximum);
+        student.setMin(minimum);
+        student.setMean(mean);
+        student.setMedian(median);
+        student.setStdev(standardDeviation);
+    }
+
+    private List<Double> getPenaltyListFor(Student student) {
+        List<Double> data = new ArrayList<>();
+        for (Student s : this.getStudents()) {
+            if (!s.equals(student)) {
+                data.add( student.getMatchScoreFor(s) );
+            }
+        }
+        return data;
+    }
+
+    public void calculatePenaltyDistributions() {
+        System.out.println("Running calculatePenaltyDistriutions()");
+        for (Student s : getStudents()) {
+            assignPenaltyStatsTo(s);
+        }
+    }
+
+    public void printStatsForMostAndLeast() {
+        System.out.println("Must run calculatePenaltyDistributions() first!");
+        Collections.sort(this.students, Comparator.comparingDouble(Student::getMin));
+        Student least = students.get(0);
+        Student most = students.get(students.size()-1);
+
+        System.out.println(least.getDisplayName() + ": min" + least.getMin() + " median: " + least.getMedian() + " max: " + least.getMax());
+        System.out.println(most.getDisplayName() + ": min" + most.getMin() + " median: " + most.getMedian() + " max: " + most.getMax());
     }
 
     public String toString() {

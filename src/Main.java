@@ -140,6 +140,10 @@ public class Main extends PApplet {
             if (indexToDisplay < 0) indexToDisplay = charts.size() - 1;
 
             this.chart = charts.get(indexToDisplay);
+
+            this.chart.calculatePenaltyDistributions();
+            this.chart.printStatsForMostAndLeast();
+
             displayList = makeDisplayListFor(chart);
         }
 
@@ -148,6 +152,10 @@ public class Main extends PApplet {
             if (indexToDisplay >= charts.size()) indexToDisplay = 0;
 
             this.chart = charts.get(indexToDisplay);
+
+            this.chart.calculatePenaltyDistributions();
+            this.chart.printStatsForMostAndLeast();
+
             displayList = makeDisplayListFor(chart);
         }
     }
