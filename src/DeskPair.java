@@ -138,4 +138,12 @@ public class DeskPair {
     public void setChart(SeatingChart seatingChart) {
         this.chart = seatingChart;
     }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int deskId) {
+        this.id = deskId;
+    }
 }

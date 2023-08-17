@@ -1,15 +1,19 @@
 import processing.core.PApplet;
 
+import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLOutput;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 /*
 TODO:   - make a separate program for generating chart
-        - re-write main so we can load charts from file or save them to file
         - on hover or click display student info side by side so I can inspect / see constraint violations
         - let me unassign + manually re-assign students
         - let me randomly generate possibilities after I hand-fix some pairs
@@ -52,7 +56,7 @@ public class Main extends PApplet {
         numNamesPerCol = (int) ((height - TOP_BUFF) / boxHeight);
 
         try {
-            ArrayList<Student> studentData = loadStudents(file);
+            ArrayList<Student> studentData = SeatingChart.loadStudents(file);
             System.out.println(studentData);
 
             chart.addStudents(studentData);
@@ -98,24 +102,6 @@ public class Main extends PApplet {
         return out;
     }
 
-    private ArrayList<Student> loadStudents(String filePath) throws IOException {
-        ArrayList<Student> students = new ArrayList<>();
-        String file = readFile(filePath);
-        String[] lines = file.split("\n");
-
-        for (String line : lines) {
-            line = line.trim();
-            try {
-                Student s = Student.makeStudentFromRow(line);
-                students.add(s);
-            } catch (Exception e) {
-                System.err.println("Error making student from line: " + line);
-            }
-        }
-
-        return students;
-    }
-
     public void draw() {
         background(255);
 
@@ -139,8 +125,23 @@ public class Main extends PApplet {
             reshuffle();
         }
 
+        if (key == 's' || key =='S') {
+            String filename = getDateString(file);
+            this.chart.saveChartToFile(filename);
+            System.out.println("Saved to " + filename);
+        }
+
         if (key == 'd' || key == 'D') {
             displayConflicts = !displayConflicts;
+        }
+
+        if (key == 'l' || key == 'L') {
+            String studentsFile = getFileWithDialog("Choose the file with the student records for this class");
+            String chartFile = getFileWithDialog("Choose the file with the chart you want to load");
+
+            this.chart = SeatingChart.createChartFromFile(chartFile, studentsFile);
+            displayList = makeDisplayListFor(chart);
+            System.out.println("Loaded chart!");
         }
 
         if (key == CODED && keyCode == UP) {
@@ -166,6 +167,37 @@ public class Main extends PApplet {
 
             displayList = makeDisplayListFor(chart);
         }
+    }
+
+    private String getFileWithDialog(String prompt) {
+        JFileChooser fileChooser = new JFileChooser();
+
+        String currentWorkingDir = System.getProperty("user.dir");
+        fileChooser.setCurrentDirectory(new File(currentWorkingDir));
+        fileChooser.setDialogTitle(prompt);
+
+        int returnVal = fileChooser.showOpenDialog(null); // Pass null to center the dialog
+
+        String ret = "";
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            ret = selectedFile.getAbsolutePath();
+            System.out.println("Chose: " + ret);
+        } else {
+            System.out.println("No file selected.");
+        }
+
+        return ret;
+    }
+
+    private String getDateString(String file) {
+        String name = file.substring(0, file.indexOf("."));
+
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = currentDate.format(dateFormatter);
+
+        return name + "-" + formattedDate + ".csv";
     }
 
     public void mouseReleased() {

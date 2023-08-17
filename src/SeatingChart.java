@@ -1,3 +1,8 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -183,7 +188,7 @@ public class SeatingChart {
         List<Double> data = new ArrayList<>();
         for (Student s : this.getStudents()) {
             if (!s.equals(student)) {
-                data.add( student.getMatchScoreFor(s) );
+                data.add(student.getMatchScoreFor(s));
             }
         }
         return data;
@@ -200,14 +205,94 @@ public class SeatingChart {
         System.out.println("Must run calculatePenaltyDistributions() first!");
         Collections.sort(this.students, Comparator.comparingDouble(Student::getMin));
         Student least = students.get(0);
-        Student most = students.get(students.size()-1);
+        Student most = students.get(students.size() - 1);
 
         System.out.println(least.getDisplayName() + ": min" + least.getMin() + " median: " + least.getMedian() + " max: " + least.getMax());
         System.out.println(most.getDisplayName() + ": min" + most.getMin() + " median: " + most.getMedian() + " max: " + most.getMax());
     }
 
-    public void saveChartToFile(String filename) {
+    public void saveChartToFile(String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            String headers = "desk id, left student id, left student fn, left student ln, right student id, right student fn, right student ln";
+            writer.write(headers);
+            writer.newLine();
 
+            for (DeskPair desk : this.desks) {
+                Student left = desk.getLeft();
+                Student right = desk.getRight();
+
+                String row = desk.getId() + ", " + left.getId() + ", " + left.getFn() + ", " + left.getLn() + ", " +
+                        right.getId() + ", " + right.getFn() + ", " + right.getLn();
+
+                writer.write(row);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<Student> loadStudents(String filePath) throws IOException {
+        ArrayList<Student> students = new ArrayList<>();
+        String file = readFile(filePath);
+        String[] lines = file.split("\n");
+
+        for (String line : lines) {
+            line = line.trim();
+            try {
+                Student s = Student.makeStudentFromRow(line);
+                students.add(s);
+            } catch (Exception e) {
+                System.err.println("Error making student from line: " + line);
+            }
+        }
+
+        return students;
+    }
+
+    public static SeatingChart createChartFromFile(String chartFilePath, String studentsFilePath) {
+        SeatingChart chart = new SeatingChart();
+
+        try {
+            ArrayList<Student> students = loadStudents(studentsFilePath);
+            chart.students = students;  // directly set the student list
+        } catch (Exception e) {
+            System.out.println("Couldn't read file " + studentsFilePath);
+        }
+
+        try {
+            String raw = readFile(chartFilePath);
+            String[] rows = raw.split("\n");
+            for (int i = 1; i < rows.length; i++) {
+                String row = rows[i];
+                String[] vals = row.split(",");
+                int deskId = Integer.parseInt( vals[0].trim() );
+                int leftStudentId = Integer.parseInt( vals[1].trim() );
+                int rightStudentId = Integer.parseInt( vals[4].trim() );
+                Student left = chart.getStudentById(leftStudentId);
+                Student right = chart.getStudentById(rightStudentId);
+                DeskPair desk = new DeskPair(left, right);
+                desk.setId(deskId);
+                chart.desks.add( desk );
+            }
+        } catch (IOException e) {
+            System.out.println("Couldn't read file " + chartFilePath);
+        }
+
+        return chart;
+    }
+
+    private Student getStudentById(int id) {
+        for (Student s : this.students) {
+            if (s.getId() == id) return s;
+        }
+
+        System.err.println("Couldn't find student with id: " + id);
+        return null;
+    }
+
+    public static String readFile(String fileName) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(fileName)));
     }
 
     public String toString() {
