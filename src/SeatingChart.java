@@ -46,7 +46,9 @@ public class SeatingChart {
     }
 
     public void seatStudent(Student s) {
-        this.allStudents.add(s);
+        if (!allStudents.contains(s)) allStudents.add(s);
+        if (needSeats.contains(s)) needSeats.remove(s);
+
         if (desks.size() * 2 < allStudents.size()) {   // we need to add a desk
             desks.add(new DeskPair(s, null, this));
         } else {
@@ -98,8 +100,40 @@ public class SeatingChart {
         return null;
     }
 
-    public void reAssignAllRandomly() {
+    public void reAssignRandomly() {
+        unseatAllStudents(false);
+        randomlyAssignAllUnseated();
+    }
+
+    public void randomlyAssignAllUnseated() {
+        Collections.shuffle(needSeats);
+
+        // TODO: ensure there are enough desks before doing this
+        for (Student s : needSeats) {
+            DeskPair d = findDeskWithSpace();
+            d.setEmptySeatTo(s);
+        }
+
+        needSeats.clear();
+    }
+
+    public void unseatAllStudents(boolean unseatFrozen) {
+        for (DeskPair desk : desks) {
+            if (unseatFrozen || !desk.isRightFrozen()) {
+                Student right = desk.removeRight();
+                needSeats.add(right);
+            }
+            if (unseatFrozen || !desk.isLeftFrozen()) {
+                Student left = desk.removeLeft();
+                needSeats.add(left);
+            }
+        }
+    }
+
+    public void forceReassignAllRandomly() {
         Collections.shuffle(this.allStudents);
+        needSeats.clear();
+
         for (int i = 0; i < allStudents.size(); i += 2) {
             Student s1 = allStudents.get(i);
             Student s2 = (i + 1 < allStudents.size()) ? allStudents.get(i + 1) : null;

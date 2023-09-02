@@ -3,24 +3,43 @@ public class DeskPair {
     private int id;
     private Student left, right;
     private SeatingChart chart;
+    private boolean freezeLeft, freezeRight;
 
     public DeskPair(Student left, Student right) {
         this.id = nextId++;
         this.left = left;
         this.right = right;
+        this.freezeRight = false;
+        this.freezeLeft = false;
     }
 
     public DeskPair(DeskPair toCopy) {
         this.id = toCopy.id;
         this.left = toCopy.left;
         this.right = toCopy.right;
+        this.freezeLeft = toCopy.freezeLeft;
+        this.freezeRight = toCopy.freezeRight;
     }
 
     public DeskPair(Student left, Student right, SeatingChart chart) {
-        this.id = nextId++;
-        this.left = left;
-        this.right = right;
+        this(left, right);
         this.chart = chart;
+    }
+
+    public boolean isLeftFrozen() {
+        return freezeLeft;
+    }
+
+    public void setFreezeLeft(boolean freezeLeft) {
+        this.freezeLeft = freezeLeft;
+    }
+
+    public boolean isRightFrozen() {
+        return freezeRight;
+    }
+
+    public void setFreezeRight(boolean freezeRight) {
+        this.freezeRight = freezeRight;
     }
 
     public Student getLeft() {
