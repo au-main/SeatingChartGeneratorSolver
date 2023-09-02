@@ -10,10 +10,11 @@ import java.util.List;
 
 public class SeatingChart {
     private ArrayList<DeskPair> desks;
-    private ArrayList<Student> allStudents;
+    private ArrayList<Student> allStudents, needSeats;
 
     public SeatingChart() {
         allStudents = new ArrayList<>();
+        needSeats = new ArrayList<>();
         desks = new ArrayList<>();
     }
 
@@ -58,21 +59,36 @@ public class SeatingChart {
         }
     }
 
+    public void unseatStudent(Student s) {
+        DeskPair desk = getStudentsDesk(s);
+        if (desk == null) return;
+
+        desk.removeStudent(s);
+        this.needSeats.add(s);
+        // BUT we won't remove the desk since we'll re-seat someone
+        // and student is still in allStudents list.
+    }
+
+    public DeskPair getStudentsDesk(Student s) {
+        for (DeskPair desk : desks) {
+            if (desk.hasStudent(s)) {
+               return desk;
+            }
+        }
+        return null;
+    }
+
     public void deleteStudent(Student s) {
         DeskPair toRemove = null;
         allStudents.remove(s);
 
-        for (DeskPair desk : desks) {
-            if (desk.hasStudent(s)) {
-                desk.removeStudent(s);
+        DeskPair desk = getStudentsDesk(s);
+        if (desk == null) return;
 
-                if (desk.isEmpty()) {
-                    toRemove = desk;
-                }
-            }
+        desk.removeStudent(s);
+        if (desk.isEmpty()) {
+            desks.remove(desk);
         }
-
-        if (toRemove != null) this.desks.remove(toRemove);
     }
 
     private DeskPair findDeskWithSpace() {
@@ -82,7 +98,7 @@ public class SeatingChart {
         return null;
     }
 
-    public void assignRandomly() {
+    public void reAssignAllRandomly() {
         Collections.shuffle(this.allStudents);
         for (int i = 0; i < allStudents.size(); i += 2) {
             Student s1 = allStudents.get(i);

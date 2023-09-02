@@ -68,12 +68,12 @@ public class Main extends PApplet {
         numColumns = (int) (chart.getAllStudents().size() / numNamesPerCol) + 1;
         columnWidth = width / numColumns;
 
-        chart.assignRandomly();
+        chart.reAssignAllRandomly();
 
         System.out.println("Generating great chart!");
         for (int i = 0; i < NUM_TO_CHECK; i++) {
             SeatingChart next = new SeatingChart(chart);
-            next.assignRandomly();
+            next.reAssignAllRandomly();
 
             charts.add(next);
             Collections.sort(charts, Comparator.comparingDouble(SeatingChart::getScore));
@@ -209,7 +209,7 @@ public class Main extends PApplet {
     }
 
     private void reshuffle() {
-        chart.assignRandomly();
+        chart.reAssignAllRandomly();
         displayList = makeDisplayListFor(chart);
     }
 
