@@ -221,8 +221,19 @@ public class SeatingChart {
                 Student left = desk.getLeft();
                 Student right = desk.getRight();
 
-                String row = desk.getId() + ", " + left.getId() + ", " + left.getFn() + ", " + left.getLn() + ", " +
-                        right.getId() + ", " + right.getFn() + ", " + right.getLn();
+                String row = desk.getId() + ", ";
+                if (left != null) {
+                    row +=  + left.getId() + ", " + left.getFn() + ", " + left.getLn() + ", ";
+
+                } else {
+                    row += ",,,";
+                }
+
+                if (right != null) {
+                    row += right.getId() + ", " + right.getFn() + ", " + right.getLn();
+                } else {
+                    row += ",,,";
+                }
 
                 writer.write(row);
                 writer.newLine();

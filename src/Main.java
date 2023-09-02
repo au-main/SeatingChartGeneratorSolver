@@ -26,7 +26,7 @@ public class Main extends PApplet {
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
     private static final int LIST_DISPLAY = 0;
-    private static final int NUM_TO_CHECK = 500000;
+    private static final int NUM_TO_CHECK = 5000000;
     private static final int NUM_TO_KEEP = 10;
 
     SeatingChart chart = new SeatingChart();
@@ -41,7 +41,9 @@ public class Main extends PApplet {
     int indexToDisplay = 0;
 
     int displayMode = LIST_DISPLAY;
-    private String file = "sampleData.csv";
+    private static final String DATA_DIR = "DataFiles/";
+    private static final String CHARTS_DIR = "SavedCharts/";
+    private String file = "block1.csv";
 
     public void settings() {
         size(1000, 1000);
@@ -56,12 +58,12 @@ public class Main extends PApplet {
         numNamesPerCol = (int) ((height - TOP_BUFF) / boxHeight);
 
         try {
-            ArrayList<Student> studentData = SeatingChart.loadStudents(file);
+            ArrayList<Student> studentData = SeatingChart.loadStudents(DATA_DIR + file);
             System.out.println(studentData);
 
             chart.addStudents(studentData);
         } catch (IOException e) {
-            System.err.println("Couldn't read the file: " + file);
+            System.err.println("Couldn't read the file: " + DATA_DIR + file);
         }
 
         numColumns = (int) (chart.getStudents().size() / numNamesPerCol) + 1;
@@ -127,8 +129,8 @@ public class Main extends PApplet {
 
         if (key == 's' || key =='S') {
             String filename = getDateString(file);
-            this.chart.saveChartToFile(filename);
-            System.out.println("Saved to " + filename);
+            this.chart.saveChartToFile(DATA_DIR + filename);
+            System.out.println("Saved to " + DATA_DIR + filename);
         }
 
         if (key == 'd' || key == 'D') {
@@ -226,6 +228,8 @@ public class Main extends PApplet {
     public static String readFile(String fileName) throws IOException {
         return new String(Files.readAllBytes(Paths.get(fileName)));
     }
+
+
 
     public static void main(String[] args) {
         PApplet.main("Main");
