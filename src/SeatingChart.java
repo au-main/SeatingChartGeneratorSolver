@@ -30,6 +30,7 @@ public class SeatingChart {
     public SeatingChart(SeatingChart toCopy) {
         allStudents = new ArrayList<>();
         desks = new ArrayList<>();
+        needSeats = new ArrayList<>();
         allStudents.addAll(toCopy.allStudents);
         needSeats.addAll(toCopy.needSeats);
         for (DeskPair desk : toCopy.desks) {
