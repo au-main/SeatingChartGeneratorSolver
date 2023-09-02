@@ -20,6 +20,7 @@ public class SeatingChart {
 
     public SeatingChart(ArrayList<Student> students) {
         this.allStudents.addAll(students);
+        needSeats = new ArrayList<>();
 
         for (int i = 0; i < this.allStudents.size() / 2 + 1; i++) {
             desks.add(new DeskPair(null, null, this));
@@ -30,6 +31,7 @@ public class SeatingChart {
         allStudents = new ArrayList<>();
         desks = new ArrayList<>();
         allStudents.addAll(toCopy.allStudents);
+        needSeats.addAll(toCopy.needSeats);
         for (DeskPair desk : toCopy.desks) {
             DeskPair copy = new DeskPair(desk);
             copy.setChart(this);
