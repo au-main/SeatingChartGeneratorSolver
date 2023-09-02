@@ -10,25 +10,25 @@ import java.util.List;
 
 public class SeatingChart {
     private ArrayList<DeskPair> desks;
-    private ArrayList<Student> students;
+    private ArrayList<Student> allStudents;
 
     public SeatingChart() {
-        students = new ArrayList<>();
+        allStudents = new ArrayList<>();
         desks = new ArrayList<>();
     }
 
     public SeatingChart(ArrayList<Student> students) {
-        this.students.addAll(students);
+        this.allStudents.addAll(students);
 
-        for (int i = 0; i < this.students.size() / 2 + 1; i++) {
+        for (int i = 0; i < this.allStudents.size() / 2 + 1; i++) {
             desks.add(new DeskPair(null, null, this));
         }
     }
 
     public SeatingChart(SeatingChart toCopy) {
-        students = new ArrayList<>();
+        allStudents = new ArrayList<>();
         desks = new ArrayList<>();
-        students.addAll(toCopy.students);
+        allStudents.addAll(toCopy.allStudents);
         for (DeskPair desk : toCopy.desks) {
             DeskPair copy = new DeskPair(desk);
             copy.setChart(this);
@@ -36,17 +36,17 @@ public class SeatingChart {
         }
     }
 
-    public ArrayList<Student> getStudents() {
-        return this.students;
+    public ArrayList<Student> getAllStudents() {
+        return this.allStudents;
     }
 
     public ArrayList<DeskPair> getDesks() {
         return this.desks;
     }
 
-    public void addStudent(Student s) {
-        this.students.add(s);
-        if (desks.size() * 2 < students.size()) {
+    public void seatStudent(Student s) {
+        this.allStudents.add(s);
+        if (desks.size() * 2 < allStudents.size()) {   // we need to add a desk
             desks.add(new DeskPair(s, null, this));
         } else {
             DeskPair desk = findDeskWithSpace();
@@ -60,7 +60,7 @@ public class SeatingChart {
 
     public void deleteStudent(Student s) {
         DeskPair toRemove = null;
-        students.remove(s);
+        allStudents.remove(s);
 
         for (DeskPair desk : desks) {
             if (desk.hasStudent(s)) {
@@ -83,10 +83,10 @@ public class SeatingChart {
     }
 
     public void assignRandomly() {
-        Collections.shuffle(this.students);
-        for (int i = 0; i < students.size(); i += 2) {
-            Student s1 = students.get(i);
-            Student s2 = (i + 1 < students.size()) ? students.get(i + 1) : null;
+        Collections.shuffle(this.allStudents);
+        for (int i = 0; i < allStudents.size(); i += 2) {
+            Student s1 = allStudents.get(i);
+            Student s2 = (i + 1 < allStudents.size()) ? allStudents.get(i + 1) : null;
 
             DeskPair desk = desks.get(i / 2);
             desk.clear();
@@ -95,9 +95,9 @@ public class SeatingChart {
         }
     }
 
-    public void addStudents(ArrayList<Student> studentData) {
+    public void seatStudents(ArrayList<Student> studentData) {
         for (Student toAdd : studentData) {
-            addStudent(toAdd);
+            seatStudent(toAdd);
         }
     }
 
@@ -186,7 +186,7 @@ public class SeatingChart {
 
     private List<Double> getPenaltyListFor(Student student) {
         List<Double> data = new ArrayList<>();
-        for (Student s : this.getStudents()) {
+        for (Student s : this.getAllStudents()) {
             if (!s.equals(student)) {
                 data.add(student.getMatchScoreFor(s));
             }
@@ -196,16 +196,16 @@ public class SeatingChart {
 
     public void calculatePenaltyDistributions() {
         System.out.println("Running calculatePenaltyDistriutions()");
-        for (Student s : getStudents()) {
+        for (Student s : getAllStudents()) {
             assignPenaltyStatsTo(s);
         }
     }
 
     public void printStatsForMostAndLeast() {
         System.out.println("Must run calculatePenaltyDistributions() first!");
-        Collections.sort(this.students, Comparator.comparingDouble(Student::getMin));
-        Student least = students.get(0);
-        Student most = students.get(students.size() - 1);
+        Collections.sort(this.allStudents, Comparator.comparingDouble(Student::getMin));
+        Student least = allStudents.get(0);
+        Student most = allStudents.get(allStudents.size() - 1);
 
         System.out.println(least.getDisplayName() + ": min" + least.getMin() + " median: " + least.getMedian() + " max: " + least.getMax());
         System.out.println(most.getDisplayName() + ": min" + most.getMin() + " median: " + most.getMedian() + " max: " + most.getMax());
@@ -266,7 +266,7 @@ public class SeatingChart {
 
         try {
             ArrayList<Student> students = loadStudents(studentsFilePath);
-            chart.students = students;  // directly set the student list
+            chart.allStudents = students;  // directly set the student list
         } catch (Exception e) {
             System.out.println("Couldn't read file " + studentsFilePath);
         }
@@ -294,7 +294,7 @@ public class SeatingChart {
     }
 
     private Student getStudentById(int id) {
-        for (Student s : this.students) {
+        for (Student s : this.allStudents) {
             if (s.getId() == id) return s;
         }
 

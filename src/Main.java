@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -61,12 +60,12 @@ public class Main extends PApplet {
             ArrayList<Student> studentData = SeatingChart.loadStudents(DATA_DIR + file);
             System.out.println(studentData);
 
-            chart.addStudents(studentData);
+            chart.seatStudents(studentData);
         } catch (IOException e) {
             System.err.println("Couldn't read the file: " + DATA_DIR + file);
         }
 
-        numColumns = (int) (chart.getStudents().size() / numNamesPerCol) + 1;
+        numColumns = (int) (chart.getAllStudents().size() / numNamesPerCol) + 1;
         columnWidth = width / numColumns;
 
         chart.assignRandomly();
