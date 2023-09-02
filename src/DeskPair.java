@@ -190,4 +190,12 @@ public class DeskPair {
         }
         return false;
     }
+
+    public void toggleFreezeLeft() {
+        this.freezeLeft = !this.freezeLeft;
+    }
+
+    public void toggleFreezeRight() {
+        this.freezeRight = !this.freezeRight;
+    }
 }

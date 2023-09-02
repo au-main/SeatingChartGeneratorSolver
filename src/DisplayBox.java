@@ -4,6 +4,7 @@ public class DisplayBox {
     private static final float MAX_PENALTY = 6;
     public static final int LEFT_COLOR = 0xFF5D3FD3;
     public static final int RIGHT_COLOR = 0xFFEEBC1D;
+    public static final int FROZEN_COLOR = 0xFFFF0000;
 
     private int x, y, w, h;
     private DeskPair desk;
@@ -65,6 +66,10 @@ public class DisplayBox {
 
         window.fill(LEFT_COLOR);
         window.stroke(LEFT_COLOR);
+        if (desk.isLeftFrozen()) {
+            window.fill(FROZEN_COLOR);
+            window.stroke(FROZEN_COLOR);
+        }
         window.text(getName1() + " ", x, y);
         float nextX = x + window.textWidth(this.getName1() + " ");
 
@@ -75,6 +80,10 @@ public class DisplayBox {
         nextX = nextX + window.textWidth("and ");
         window.fill(RIGHT_COLOR);
         window.fill(RIGHT_COLOR);
+        if (desk.isRightFrozen()) {
+            window.fill(FROZEN_COLOR);
+            window.stroke(FROZEN_COLOR);
+        }
         window.text(getName2(), nextX, y);
 
         window.fill(0);
@@ -93,9 +102,23 @@ public class DisplayBox {
         return (x < mousex && mousex < x + w) && (y < mousey && mousey < y + h);
     }
 
+    public boolean isMouseOverLeftName(int mousex, int mousey, PApplet window) {
+        if (!isMouseOver(mousex, mousey)) return false;
+
+        float n1Width = window.textWidth(this.getName1());
+        return (mousex < x + n1Width);
+    }
+
+    public boolean isMouseOverRightName(int mousex, int mousey, PApplet window) {
+        if (!isMouseOver(mousex, mousey)) return false;
+
+        float n2Width = window.textWidth(this.getName2());
+        float textWidth = window.textWidth(this.getText());
+        return mousex > x + textWidth - n2Width;
+    }
+
     public void handleMouseClick(int mousex, int mousey, int lastMouseButton, PApplet window) {
         if (!isMouseOver(mousex, mousey)) return;
-
 
         float n1Width = window.textWidth(this.getName1());
         if (mousex < x + n1Width) {
@@ -115,7 +138,6 @@ public class DisplayBox {
                 this.desk.unseatRight();
             }
         }
-
     }
 
     private void removeStudent2() {
@@ -144,5 +166,9 @@ public class DisplayBox {
 
     public void setWidthFromContents(PApplet window) {
         this.w = (int) (window.textWidth(this.getText())) + 1;
+    }
+
+    public DeskPair getDeskPair() {
+        return this.desk;
     }
 }

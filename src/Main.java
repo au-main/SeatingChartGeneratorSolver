@@ -146,6 +146,19 @@ public class Main extends PApplet {
             System.out.println("Loaded chart!");
         }
 
+        if (key == 'f' || key == 'F') {
+            for (DisplayBox box : displayList) {
+                if (box.isMouseOver(mouseX, mouseY)) {
+                    DeskPair desk = box.getDeskPair();
+                    if (box.isMouseOverLeftName(mouseX, mouseY, this)) {
+                        desk.toggleFreezeLeft();
+                    } else if (box.isMouseOverRightName(mouseX, mouseY, this)) {
+                        desk.toggleFreezeRight();
+                    }
+                }
+            }
+        }
+
         if (key == CODED && keyCode == UP) {
             indexToDisplay--;
             if (indexToDisplay < 0) indexToDisplay = charts.size() - 1;
@@ -214,7 +227,7 @@ public class Main extends PApplet {
     }
 
     private void reshuffle() {
-        chart.forceReassignAllRandomly();
+        chart.reAssignRandomly();
         displayList = makeDisplayListFor(chart);
     }
 
