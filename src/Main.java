@@ -25,7 +25,7 @@ public class Main extends PApplet {
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
     private static final int LIST_DISPLAY = 0;
-    private static final int NUM_TO_CHECK = 5000000;
+    private static final int NUM_TO_CHECK = 500;
     private static final int NUM_TO_KEEP = 10;
 
     SeatingChart chart = new SeatingChart();
@@ -43,6 +43,7 @@ public class Main extends PApplet {
     private static final String DATA_DIR = "DataFiles/";
     private static final String CHARTS_DIR = "SavedCharts/";
     private String file = "block1.csv";
+    private int lastMouseButton;
 
     public void settings() {
         size(1000, 1000);
@@ -200,10 +201,14 @@ public class Main extends PApplet {
 
         return name + "-" + formattedDate + ".csv";
     }
+    
+    public void mousePressed() {
+        lastMouseButton = mouseButton;
+    }
 
     public void mouseReleased() {
         for (DisplayBox box : displayList) {
-            box.handleMouseClick(mouseX, mouseY, this);
+            box.handleMouseClick(mouseX, mouseY, lastMouseButton, this);
         }
         displayList = makeDisplayListFor(chart);
     }

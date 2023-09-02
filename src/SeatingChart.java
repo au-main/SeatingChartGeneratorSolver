@@ -65,6 +65,7 @@ public class SeatingChart {
     }
 
     public void unseatStudent(Student s) {
+        if (s == null) return;
         DeskPair desk = getStudentsDesk(s);
         if (desk == null) return;
 
@@ -75,6 +76,8 @@ public class SeatingChart {
     }
 
     public DeskPair getStudentsDesk(Student s) {
+        if (s == null) return null;
+
         for (DeskPair desk : desks) {
             if (desk.hasStudent(s)) {
                return desk;
@@ -156,28 +159,38 @@ public class SeatingChart {
 
     // If more than 1 desk with 1 person missing, we'll combine folks who don't have partners
     public void consolodate() {
-        ArrayList<DeskPair> desksWithEmpty = new ArrayList<>();
+        ArrayList<DeskPair> desksWithOne = new ArrayList<>();
+        ArrayList<DeskPair> emptyDesks = new ArrayList<>();
         for (DeskPair desk : desks) {
             if (desk.hasSpace()) {
-                desksWithEmpty.add(desk);
+                if (!desk.isEmpty()) {
+                    desksWithOne.add(desk);
+                } else {
+                    emptyDesks.add(desk);
+                }
             }
         }
-        if (desksWithEmpty.size() <= 1) return;
 
-        for (int i = 0; i < desksWithEmpty.size(); i += 2) {
-            DeskPair d1 = desksWithEmpty.get(i);
-            DeskPair d2 = desksWithEmpty.get(i + 1);
+        if (desksWithOne.size() <= 1) return;
 
+        for (int i = 0; i < desksWithOne.size(); i += 2) {
+            DeskPair d1 = desksWithOne.get(i);
+            if (i+1 >= desksWithOne.size()) break;
+            DeskPair d2 = desksWithOne.get(i+1);
+
+            // move single student from d2 to d1.  Add d2 to empty desks list.
             Student s = (d2.getRight() == null ? d2.removeLeft() : d2.removeRight());
-            if (d1.getLeft() == null) {
-                d1.setLeft(s);
-            } else {
-                d1.setRight(s);
-            }
+            d1.seat(s);
+            emptyDesks.add(d2);
         }
 
-        for (DeskPair desk : desksWithEmpty) {
-            if (desk.isEmpty()) desks.remove(desk);
+        // remove all empty desks.  TODO:  do I really want to do this here??
+        for (int i = 0; i < desks.size(); i++) {
+            DeskPair desk = desks.get(i);
+            if (desk.isEmpty()) {
+                desks.remove(desk);
+                i--;
+            }
         }
     }
 

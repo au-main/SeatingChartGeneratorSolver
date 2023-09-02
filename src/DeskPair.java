@@ -94,6 +94,7 @@ public class DeskPair {
     }
 
     public boolean hasStudent(Student s) {
+        if (s == null) return false;
         Student right = getRight();
         if (right != null && right.equals(s)) return true;
 
@@ -164,5 +165,29 @@ public class DeskPair {
 
     public void setId(int deskId) {
         this.id = deskId;
+    }
+
+    public void unseatLeft() {
+        if (chart == null) return;
+        if (leftEmpty()) return;
+        this.chart.unseatStudent(this.left);
+    }
+
+    public void unseatRight() {
+        if (chart == null) return;
+        if (rightEmpty()) return;
+        this.chart.unseatStudent(this.right);
+    }
+
+    public boolean seat(Student s) {
+        if (!hasSpace()) return false;
+        if (leftEmpty()) {
+            setLeft(s);
+            return true;
+        } else if (rightEmpty()) {
+            setRight(s);
+            return true;
+        }
+        return false;
     }
 }
