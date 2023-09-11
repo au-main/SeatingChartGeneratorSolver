@@ -14,7 +14,9 @@ import java.util.Comparator;
 /*
 TODO:   - make a separate program for generating chart
         - on hover or click display student info side by side so I can inspect / see constraint violations
-        - let me unassign + manually re-assign students
+        - toggle student display for skill levels red to green.
+
+        - display list of unseated students and let me drag to reseat?
         - let me randomly generate possibilities after I hand-fix some pairs
 
         - make improved search --> greedy assignment w/ backtracking?
@@ -24,8 +26,9 @@ TODO:   - make a separate program for generating chart
 public class Main extends PApplet {
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
+    private static final int LEFT_BUFF = 60;
     private static final int LIST_DISPLAY = 0;
-    private static final int NUM_TO_CHECK = 500;
+    private static final int NUM_TO_CHECK = 50000;
     private static final int NUM_TO_KEEP = 10;
 
     SeatingChart chart = new SeatingChart();
@@ -42,7 +45,7 @@ public class Main extends PApplet {
     int displayMode = LIST_DISPLAY;
     private static final String DATA_DIR = "DataFiles/";
     private static final String CHARTS_DIR = "SavedCharts/";
-    private String file = "block1.csv";
+    private String file = "block2.csv";
     private int lastMouseButton;
 
     public void settings() {
@@ -91,7 +94,7 @@ public class Main extends PApplet {
         int col = 0;
 
         for (DeskPair desk : chart.getDesks()) {
-            DisplayBox box = new DisplayBox(col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, desk);
+            DisplayBox box = new DisplayBox(LEFT_BUFF + col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, desk);
             box.setWidthFromContents(this);
             out.add(box);
 
@@ -108,9 +111,15 @@ public class Main extends PApplet {
         background(255);
 
         text("Left Seat   and   Right Seat", displayList.get(0).getX(), 30);
-        text("Left Seat   and   Right Seat", 500 + displayList.get(0).getX(), 30);
+        //text("Left Seat   and   Right Seat", LEFT_BUFF + 500 + displayList.get(0).getX(), 30);
 
+        int deskNum = 1;
         for (DisplayBox box : displayList) {
+            fill(0);
+            stroke(0);
+            textSize(32);
+            text(""+deskNum, 10, box.getY());
+            deskNum++;
             box.draw(this, displayConflicts);
 
             if (box.isMouseOver(mouseX, mouseY)) {
@@ -231,22 +240,9 @@ public class Main extends PApplet {
         displayList = makeDisplayListFor(chart);
     }
 
-/*    private ArrayList<Student> getNamesFrom(ArrayList<DisplayBox> students) {
-        ArrayList<Student> currentStudents = new ArrayList<>();
-        for ( DisplayBox box : students) {
-            Student s1 = box.getStudent1();
-            Student s2 = box.getStudent2();
-            if (s1 != null) currentStudents.add(s1);
-            if (s2 != null) currentStudents.add(s2);
-        }
-        return currentStudents;
-    }*/
-
     public static String readFile(String fileName) throws IOException {
         return new String(Files.readAllBytes(Paths.get(fileName)));
     }
-
-
 
     public static void main(String[] args) {
         PApplet.main("Main");

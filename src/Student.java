@@ -1,5 +1,5 @@
 public class Student {
-    private static final double LARGE_EXP_DIFF_THRESHOLD = 1.2;
+    private static final double LARGE_EXP_DIFF_THRESHOLD = 2;
     private static final double WORK_WITH_LESS_PENALTY = 1;
     private static final double WORK_WITH_SAME_PENALTY = 0.5;
     private static final double WORK_WITH_MORE_PENALTY = 0.3;
