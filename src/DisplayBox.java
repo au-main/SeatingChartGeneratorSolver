@@ -5,11 +5,26 @@ public class DisplayBox {
     public static final int LEFT_COLOR = 0xFF5D3FD3;
     public static final int RIGHT_COLOR = 0xFFEEBC1D;
     public static final int FROZEN_COLOR = 0xFFFF0000;
+    private static int nextId = 1;
 
     private int x, y, w, h;
+    private int id;
     private DeskPair desk;
 
     public DisplayBox(int x, int y, int w, int h, DeskPair desk) {
+        this.id = nextId;
+        nextId++;
+
+        this.x = x;
+        this.y = y;
+        this.h = h;
+        this.w = w;
+        this.desk = desk;
+    }
+
+    public DisplayBox(int id, int x, int y, int w, int h, DeskPair desk) {
+        this.id = id;
+
         this.x = x;
         this.y = y;
         this.h = h;
@@ -53,9 +68,42 @@ public class DisplayBox {
         return getName1() + " and " + getName2();
     }
 
-    public void draw(PApplet window, boolean shadeConstraintViolations) {
+    // names stacked vertically
+    public void drawLayoutDisplay(PApplet window) {
         window.fill(255);
-        window.stroke(255);
+        window.stroke(0);
+       /* if (shadeConstraintViolations) {
+            float val = 255 * window.map((float) desk.getPenalty(), 0, MAX_PENALTY, 0, 1);
+            window.fill(255, 255 - val, 255 - val);
+        }*/
+        window.rect(x, y, w, h);
+        window.fill(0);
+        window.line(x, y + h/2, x + w, y + h/2);
+        window.textAlign(window.LEFT, window.TOP);
+
+        if (desk != null && desk.isLeftFrozen()) {
+            window.fill(FROZEN_COLOR);
+            window.stroke(FROZEN_COLOR);
+        }
+        window.text(getName1() + " ", x + 5, y + h/5);
+
+        if (desk != null && desk.isRightFrozen()) {
+            window.fill(FROZEN_COLOR);
+            window.stroke(FROZEN_COLOR);
+        }
+        window.text(getName2(), x + 5, y + 3*h/5);
+
+        window.fill(0);
+        window.stroke(0);
+    }
+
+    public void drawListDisplay(PApplet window, boolean shadeConstraintViolations) {
+        drawListDisplay(window, shadeConstraintViolations, false);
+    }
+
+    public void drawListDisplay(PApplet window, boolean shadeConstraintViolations, boolean displayDeskId) {
+        window.fill(255);
+        window.stroke(0);
         if (shadeConstraintViolations) {
             float val = 255 * window.map((float) desk.getPenalty(), 0, MAX_PENALTY, 0, 1);
             window.fill(255, 255 - val, 255 - val);
@@ -64,9 +112,13 @@ public class DisplayBox {
         window.fill(0);
         window.textAlign(window.LEFT, window.TOP);
 
+        if (displayDeskId) {
+            window.text("" + this.getId(), x + getW() / 2, y + getH());
+        }
+
         window.fill(LEFT_COLOR);
         window.stroke(LEFT_COLOR);
-        if (desk.isLeftFrozen()) {
+        if (desk != null && desk.isLeftFrozen()) {
             window.fill(FROZEN_COLOR);
             window.stroke(FROZEN_COLOR);
         }
@@ -80,7 +132,7 @@ public class DisplayBox {
         nextX = nextX + window.textWidth("and ");
         window.fill(RIGHT_COLOR);
         window.fill(RIGHT_COLOR);
-        if (desk.isRightFrozen()) {
+        if (desk != null && desk.isRightFrozen()) {
             window.fill(FROZEN_COLOR);
             window.stroke(FROZEN_COLOR);
         }
@@ -90,11 +142,21 @@ public class DisplayBox {
         window.stroke(0);
     }
 
+    int getId() {
+        return this.id;
+    }
+
+    private void setId(int id) {
+        this.id = id;
+    }
+
     public String getName1() {
+        if (desk == null) return " no one";
         return (this.desk.getLeft() != null ? this.desk.getLeft().getDisplayName() : " no one");
     }
 
     public String getName2() {
+        if (desk == null) return " no one";
         return (this.desk.getRight() != null ? this.desk.getRight().getDisplayName() : " no one");
     }
 
