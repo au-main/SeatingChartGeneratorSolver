@@ -314,7 +314,8 @@ public class SeatingChart {
         String file = readFile(filePath);
         String[] lines = file.split("\n");
 
-        for (String line : lines) {
+        for (int i = 1; i < lines.length; i++) {
+            String line = lines[i];
             line = line.trim();
             try {
                 Student s = Student.makeStudentFromRow(line);

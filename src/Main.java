@@ -1,6 +1,7 @@
 import processing.core.PApplet;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,8 +29,9 @@ public class Main extends PApplet {
     private static final int TOP_BUFF = 80;
     private static final int LEFT_BUFF = 60;
     private static final int LIST_DISPLAY = 0;
-    private static final int NUM_TO_CHECK = 50000;
-    private static final int NUM_TO_KEEP = 10;
+    private static final int LAYOUT_DISPLAY = 1;
+    private static final int NUM_TO_CHECK = 10;
+    private static final int NUM_TO_KEEP = 20;
 
     SeatingChart chart = new SeatingChart();
     ArrayList<SeatingChart> charts = new ArrayList<>();
@@ -45,7 +47,7 @@ public class Main extends PApplet {
     int displayMode = LIST_DISPLAY;
     private static final String DATA_DIR = "DataFiles/";
     private static final String CHARTS_DIR = "SavedCharts/";
-    private String file = "block2.csv";
+    private String file = "block6.csv";
     private int lastMouseButton;
 
     public void settings() {
@@ -90,26 +92,59 @@ public class Main extends PApplet {
 
     private ArrayList<DisplayBox> makeDisplayListFor(SeatingChart chart) {
         ArrayList<DisplayBox> out = new ArrayList<>();
-        int row = 0;
-        int col = 0;
 
-        for (DeskPair desk : chart.getDesks()) {
-            DisplayBox box = new DisplayBox(LEFT_BUFF + col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, desk);
-            box.setWidthFromContents(this);
-            out.add(box);
+        if (displayMode == LIST_DISPLAY) {
+            int row = 0;
+            int col = 0;
 
-            row++;
-            if (row >= numNamesPerCol) {
-                row = 0;
-                col++;
+            for (DeskPair desk : chart.getDesks()) {
+                DisplayBox box = new DisplayBox(LEFT_BUFF + col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, desk);
+                box.setWidthFromContents(this);
+                out.add(box);
+
+                row++;
+                if (row >= numNamesPerCol) {
+                    row = 0;
+                    col++;
+                }
             }
+            return out;
+        } else if (displayMode == LAYOUT_DISPLAY){
+            int row = 0;
+            int col = 0;
+
+            for (DeskPair desk : chart.getDesks()) {
+                DisplayBox box = new DisplayBox(LEFT_BUFF + col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, desk);
+                box.setWidthFromContents(this);
+                out.add(box);
+
+                row++;
+                if (row >= numNamesPerCol) {
+                    row = 0;
+                    col++;
+                }
+            }
+            return out;
         }
+
         return out;
     }
 
     public void draw() {
         background(255);
 
+        if (displayMode == LIST_DISPLAY) {
+            listDisplay();
+        } else if (displayMode == LAYOUT_DISPLAY) {
+            layoutDisplay();
+        }
+    }
+
+    private void layoutDisplay() {
+
+    }
+
+    private void listDisplay() {
         text("Left Seat   and   Right Seat", displayList.get(0).getX(), 30);
         //text("Left Seat   and   Right Seat", LEFT_BUFF + 500 + displayList.get(0).getX(), 30);
 
@@ -120,7 +155,7 @@ public class Main extends PApplet {
             textSize(32);
             text(""+deskNum, 10, box.getY());
             deskNum++;
-            box.draw(this, displayConflicts);
+            box.drawListDisplay(this, displayConflicts);
 
             if (box.isMouseOver(mouseX, mouseY)) {
                 box.highlight(this);

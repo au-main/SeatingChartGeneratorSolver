@@ -1,5 +1,5 @@
 public class Student {
-    private static final double LARGE_EXP_DIFF_THRESHOLD = 2;
+    private static final double LARGE_EXP_DIFF_THRESHOLD = 1.8;
     private static final double WORK_WITH_LESS_PENALTY = 1;
     private static final double WORK_WITH_SAME_PENALTY = 0.5;
     private static final double WORK_WITH_MORE_PENALTY = 0.3;
@@ -44,6 +44,7 @@ public class Student {
         boolean solo = Boolean.parseBoolean(vals[13]);
         boolean collab = Boolean.parseBoolean(vals[14]);
 
+        System.out.println("Making student obj for " + fn + " " + ln);
         Student s = new Student(id, fn, ln, fn + " " + ln.substring(0,1) + ".", 0, exp, same, more, less, solo, collab);
         return s;
     }
