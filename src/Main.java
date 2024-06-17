@@ -19,7 +19,7 @@ public class Main extends PApplet {
     int columnWidth;
 
     int displayMode = LIST_DISPLAY;
-    private String file = "sampleData.csv";
+    private String file = "DataFiles/block1.csv";
 
     public void settings() {
         size(1000, 1000);
@@ -54,7 +54,7 @@ public class Main extends PApplet {
         int row = 0;
         int col = 0;
 
-        for (DeskPair desk : chart.getDesks()) {
+        for (Group desk : chart.getGroups()) {
             DisplayBox box = new DisplayBox(col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, desk);
             box.setWidthFromContents(this);
             out.add(box);

@@ -2,12 +2,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class SeatingChart {
-    private ArrayList<DeskPair> desks;
+    private ArrayList<Group> groups;
     private ArrayList<Student> students;
 
     public SeatingChart() {
         students = new ArrayList<>();
-        desks = new ArrayList<>();
+        groups = new ArrayList<>();
     }
 
     public SeatingChart(ArrayList<Student> students) {
@@ -16,7 +16,7 @@ public class SeatingChart {
         }
 
         for (int i = 0; i < this.students.size()/2 + 1; i++) {
-            desks.add( new DeskPair(null, null, this) );
+            groups.add( new Group(null, null, this) );
         }
     }
 
@@ -24,29 +24,29 @@ public class SeatingChart {
         return this.students;
     }
 
-    public ArrayList<DeskPair> getDesks() {
-        return this.desks;
+    public ArrayList<Group> getGroups() {
+        return this.groups;
     }
 
     public void addStudent(Student s) {
         this.students.add(s);
-        if (desks.size()*2 < students.size()) {
-            desks.add( new DeskPair(s, null, this) );
+        if (groups.size()*2 < students.size()) {
+            groups.add( new Group(s, null, this) );
         } else {
-            DeskPair desk = findDeskWithSpace();
+            Group desk = findDeskWithSpace();
             if (desk != null) {
                 desk.setEmptySeatTo(s);
             } else {
-                desks.add( new DeskPair(s, null, this) );
+                groups.add( new Group(s, null, this) );
             }
         }
     }
 
     public void deleteStudent(Student s) {
-        DeskPair toRemove = null;
+        Group toRemove = null;
         students.remove(s);
 
-        for (DeskPair desk : desks) {
+        for (Group desk : groups) {
             if (desk.hasStudent(s)) {
                 desk.removeStudent(s);
 
@@ -56,11 +56,11 @@ public class SeatingChart {
             }
         }
 
-        if (toRemove != null) this.desks.remove(toRemove);
+        if (toRemove != null) this.groups.remove(toRemove);
     }
 
-    private DeskPair findDeskWithSpace() {
-        for (DeskPair desk : desks) {
+    private Group findDeskWithSpace() {
+        for (Group desk : groups) {
             if (desk.hasSpace()) return desk;
         }
         return null;
@@ -72,7 +72,7 @@ public class SeatingChart {
             Student s1 = students.get(i);
             Student s2 =  (i+1 < students.size()) ? students.get(i+1) : null;
 
-            DeskPair desk = desks.get(i/2);
+            Group desk = groups.get(i/2);
             desk.clear();
             desk.setLeft(s1);
             desk.setRight(s2);
@@ -87,29 +87,41 @@ public class SeatingChart {
 
     // If more than 1 desk with 1 person missing, we'll combine folks who don't have partners
     public void consolodate() {
-        ArrayList<DeskPair> desksWithEmpty = new ArrayList<>();
-        for (DeskPair desk : desks) {
+        ArrayList<Group> desksWithEmpty = new ArrayList<>();
+        for (Group desk : groups) {
             if (desk.hasSpace()) {
                 desksWithEmpty.add(desk);
             }
         }
         if (desksWithEmpty.size() <= 1) return;
 
-        for (int i = 0; i < desksWithEmpty.size(); i += 2) {
-            DeskPair d1 = desksWithEmpty.get(i);
-            DeskPair d2 = desksWithEmpty.get(i+1);
-
-            Student s = (d2.getRight() == null?d2.removeLeft():d2.removeRight());
-            if (d1.getLeft() == null) {
-                d1.setLeft(s);
-            } else {
-                d1.setRight(s);
+        while (desksWithEmpty.size() > 1) {
+            Group group = desksWithEmpty.remove(0);
+            while (!group.isEmpty() && !isFull(desksWithEmpty)) {
+                Student s = group.removeStudent();
+                assignStudent(s, desksWithEmpty);
+            }
+            if (group.isEmpty()) {
+                groups.remove(group);
             }
         }
+    }
 
-        for (DeskPair desk : desksWithEmpty) {
-            if (desk.isEmpty()) desks.remove(desk);
+    private void assignStudent(Student s, ArrayList<Group> desksWithEmpty) {
+        for (Group group: desksWithEmpty) {
+            if (group.hasSpace()) {
+                group.add(s);
+                if (!group.hasSpace()) desksWithEmpty.remove(group);
+                return;
+            }
         }
+    }
+
+    private boolean isFull(ArrayList<Group> desksWithEmpty) {
+        for (Group g:desksWithEmpty) {
+            if (g.hasSpace()) return false;
+        }
+        return true;
     }
 
     /***
@@ -118,7 +130,7 @@ public class SeatingChart {
      */
     public double getScore() {
         double penalty = 0;
-        for (DeskPair desk : desks) {
+        for (Group desk : groups) {
             penalty += desk.getPenalty();
         }
         return penalty;

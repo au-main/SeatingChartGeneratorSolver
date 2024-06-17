@@ -2,9 +2,9 @@ import processing.core.PApplet;
 
 public class DisplayBox {
     private int x, y, w, h;
-    private DeskPair desk;
+    private Group desk;
 
-    public DisplayBox(int x, int y,int w, int h, DeskPair desk) {
+    public DisplayBox(int x, int y,int w, int h, Group desk) {
         this.x = x;
         this.y = y;
         this.h = h;
