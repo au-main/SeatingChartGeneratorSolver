@@ -17,6 +17,10 @@ public class Group {
         seats = Arrays.copyOf(students, students.length);
     }
 
+    public Group(SeatingChart chart, int studentsPerGroup) {
+        this(chart, new Student[studentsPerGroup]);
+    }
+
     public Group(Student... students) {
         this(null, students);
     }
@@ -175,5 +179,9 @@ public class Group {
             }
         }
         return false;
+    }
+
+    public int size() {
+        return seats.length;
     }
 }

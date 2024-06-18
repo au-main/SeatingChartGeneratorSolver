@@ -4,19 +4,23 @@ import java.util.Collections;
 public class SeatingChart {
     private ArrayList<Group> groups;
     private ArrayList<Student> students;
+    private int studentsPerGroup;
 
-    public SeatingChart() {
+    public SeatingChart(int studentsPerGroup) {
         students = new ArrayList<>();
         groups = new ArrayList<>();
+        this.studentsPerGroup = studentsPerGroup;
     }
 
-    public SeatingChart(ArrayList<Student> students) {
+    public SeatingChart(ArrayList<Student> students, int studentsPerGroup) {
+        this.studentsPerGroup = studentsPerGroup;
+
         for (Student s : students) {
             this.students.add(s);
         }
 
-        for (int i = 0; i < this.students.size()/2 + 1; i++) {
-            groups.add( new Group(null, null, this) );
+        for (int i = 0; i <= students.size() / studentsPerGroup; i++) {
+            groups.add(new Group(this, studentsPerGroup));
         }
     }
 
@@ -30,16 +34,16 @@ public class SeatingChart {
 
     public void addStudent(Student s) {
         this.students.add(s);
-        if (groups.size()*2 < students.size()) {
-            groups.add( new Group(s, null, this) );
+
+        Group desk = findDeskWithSpace();
+        if (desk != null) {
+            desk.setEmptySeatTo(s);
         } else {
-            Group desk = findDeskWithSpace();
-            if (desk != null) {
-                desk.setEmptySeatTo(s);
-            } else {
-                groups.add( new Group(s, null, this) );
-            }
+            Student[] list = new Student[studentsPerGroup];
+            list[0] = s;
+            groups.add(new Group(this, list));
         }
+
     }
 
     public void deleteStudent(Student s) {
@@ -67,15 +71,22 @@ public class SeatingChart {
     }
 
     public void assignRandomly() {
-        Collections.shuffle(this.students);
-        for (int i = 0; i < students.size(); i += 2) {
-            Student s1 = students.get(i);
-            Student s2 =  (i+1 < students.size()) ? students.get(i+1) : null;
+        clearGroupAssignments();
 
-            Group desk = groups.get(i/2);
+        Collections.shuffle(this.students);
+        int nextStudent = 0;
+        for (Group group : groups) {
+            for (int n = 0; n < studentsPerGroup; n++) {
+                group.add(students.get(nextStudent));
+                nextStudent++;
+                if (nextStudent >= students.size()) return;
+            }
+        }
+    }
+
+    private void clearGroupAssignments() {
+        for (Group desk : this.groups) {
             desk.clear();
-            desk.setLeft(s1);
-            desk.setRight(s2);
         }
     }
 
@@ -108,7 +119,7 @@ public class SeatingChart {
     }
 
     private void assignStudent(Student s, ArrayList<Group> desksWithEmpty) {
-        for (Group group: desksWithEmpty) {
+        for (Group group : desksWithEmpty) {
             if (group.hasSpace()) {
                 group.add(s);
                 if (!group.hasSpace()) desksWithEmpty.remove(group);
@@ -118,7 +129,7 @@ public class SeatingChart {
     }
 
     private boolean isFull(ArrayList<Group> desksWithEmpty) {
-        for (Group g:desksWithEmpty) {
+        for (Group g : desksWithEmpty) {
             if (g.hasSpace()) return false;
         }
         return true;

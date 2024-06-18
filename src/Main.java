@@ -10,7 +10,9 @@ public class Main extends PApplet {
     private static final int TOP_BUFF = 80;
     private static final int LIST_DISPLAY = 0;
 
-    SeatingChart chart = new SeatingChart();
+    private int studentsPerGroup = 3;
+
+    SeatingChart chart = new SeatingChart(studentsPerGroup);
     ArrayList<DisplayBox> displayList = new ArrayList<DisplayBox>();
     float verticalBuffer = 10;
     float horizBuffer = 10;
@@ -20,6 +22,7 @@ public class Main extends PApplet {
 
     int displayMode = LIST_DISPLAY;
     private String file = "DataFiles/block1.csv";
+
 
     public void settings() {
         size(1000, 1000);
@@ -31,7 +34,7 @@ public class Main extends PApplet {
         float strDescent = textDescent();
         textHeight = strAscent + strDescent;
         boxHeight = textHeight + verticalBuffer;
-        numNamesPerCol = (int) ((height - TOP_BUFF) / boxHeight);
+        numNamesPerCol = (int) (studentsPerGroup*(height - TOP_BUFF) / boxHeight);
 
         try {
             ArrayList<Student> studentData = loadStudents(file);
@@ -55,7 +58,7 @@ public class Main extends PApplet {
         int col = 0;
 
         for (Group desk : chart.getGroups()) {
-            DisplayBox box = new DisplayBox(col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, 1, 2, desk);
+            DisplayBox box = new DisplayBox(col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, 1, desk.size(), desk);
             //box.setWidthFromContents(this);
             out.add(box);
 
