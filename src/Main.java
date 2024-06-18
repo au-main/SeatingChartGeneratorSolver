@@ -55,8 +55,8 @@ public class Main extends PApplet {
         int col = 0;
 
         for (Group desk : chart.getGroups()) {
-            DisplayBox box = new DisplayBox(col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, desk);
-            box.setWidthFromContents(this);
+            DisplayBox box = new DisplayBox(col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, 1, 2, desk);
+            //box.setWidthFromContents(this);
             out.add(box);
 
             row++;
@@ -65,6 +65,7 @@ public class Main extends PApplet {
                 col++;
             }
         }
+
         return out;
     }
 
