@@ -5,9 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+/*
+TODO: adjust font smaller automatically (or clip names) ?
+
+ */
+
 public class Main extends PApplet {
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
+    private static final int LEFT_BUFF = 80;
     private static final int LIST_DISPLAY = 0;
 
     private int studentsPerGroup = 3;
@@ -15,7 +21,6 @@ public class Main extends PApplet {
     SeatingChart chart = new SeatingChart(studentsPerGroup);
     ArrayList<DisplayBox> displayList = new ArrayList<DisplayBox>();
     float verticalBuffer = 10;
-    float horizBuffer = 10;
     float textHeight, boxHeight;
     int numNamesPerCol, numColumns;
     int columnWidth;
@@ -46,7 +51,7 @@ public class Main extends PApplet {
         }
 
         numColumns = (int) (chart.getStudents().size() / numNamesPerCol) + 1;
-        columnWidth = width / numColumns;
+        columnWidth = (width-LEFT_BUFF) / numColumns;
 
         chart.assignRandomly();
         displayList = makeDisplayListFor(chart);
@@ -58,7 +63,7 @@ public class Main extends PApplet {
         int col = 0;
 
         for (Group desk : chart.getGroups()) {
-            DisplayBox box = new DisplayBox(col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, 1, desk.size(), desk);
+            DisplayBox box = new DisplayBox(LEFT_BUFF + col * columnWidth, TOP_BUFF + (int) (row * boxHeight), this.columnWidth, (int) boxHeight, 1, desk.size(), desk);
             //box.setWidthFromContents(this);
             out.add(box);
 
@@ -93,12 +98,27 @@ public class Main extends PApplet {
     public void draw() {
         background(255);
 
+        drawRowNumbers();
+        drawColHeaders();
+
         for (DisplayBox box : displayList) {
             box.draw(this);
 
             if (box.isMouseOver(mouseX, mouseY)) {
                 box.highlight(this);
             }
+        }
+    }
+
+    private void drawColHeaders() {
+        for (int i = 0; i < studentsPerGroup; i++) {
+            text("seat " + (i+1), LEFT_BUFF + i*(columnWidth/studentsPerGroup), 10);
+        }
+    }
+
+    private void drawRowNumbers() {
+        for (int i = 1; i <= displayList.size(); i++) {
+            text(""+i, 5,TOP_BUFF + (i-1)*boxHeight);
         }
     }
 
@@ -109,10 +129,12 @@ public class Main extends PApplet {
     }
 
     public void mouseReleased() {
-        for (DisplayBox box : displayList) {
-            box.handleMouseClick(mouseX, mouseY, this);
+        if (mouseButton == RIGHT) {
+            for (DisplayBox box : displayList) {
+                box.handleMouseClick(mouseX, mouseY, this);
+            }
+            displayList = makeDisplayListFor(chart);
         }
-        displayList = makeDisplayListFor(chart);
     }
 
     private void reshuffle() {
