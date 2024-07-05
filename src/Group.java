@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Group {
+    private static final double[] PENALTY_LEVEL = {4, 16, 16*4, 16*16};
     private static final int LEFT = 0;
     private static final int RIGHT = 1;
     private static int nextId = 1;
@@ -177,11 +178,21 @@ public class Group {
     public double getPenalty() {
         double penalty = 0;
 
-        if (getLeft() != null) {
-            penalty += getLeft().matchScoreWith(getRight());
-        }
-        if (getRight() != null) {
-            penalty += getRight().matchScoreWith(getLeft());
+        penalty += getRepeatedPartnerPentalty();
+
+        return penalty;
+    }
+
+    private double getRepeatedPartnerPentalty() {
+        double penalty = 0;
+        for (int i = 0; i < this.seats.length; i++) {
+            if (seats[i] == null) continue;
+
+            for (int j = i+1; j < seats.length; j++) {
+                if (seats[j] == null) continue;
+
+                penalty += PENALTY_LEVEL[0] * seats[i].timesSatWith(""+seats[j].getId());
+            }
         }
 
         return penalty;
@@ -199,5 +210,18 @@ public class Group {
 
     public int size() {
         return seats.length;
+    }
+
+    public void updatePartnerHistories() {
+        for (int i = 0; i < seats.length; i++) {
+            if (seats[i] == null) continue;
+
+            for (int j = i+1; j < seats.length; j++) {
+                if (seats[j] == null) continue;
+
+                seats[i].recordSittingWith(seats[j]);
+                seats[j].recordSittingWith(seats[i]);
+            }
+        }
     }
 }

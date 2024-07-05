@@ -1,6 +1,7 @@
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.sun.org.apache.xpath.internal.operations.Equals;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 public class Student {
@@ -18,6 +19,7 @@ public class Student {
     private double experienceLevel;
     private boolean wantsSame, wantsMore, wantsLess;
     private boolean likesSolo, likeCollab;
+    private HashMap<String, Integer> partnerHistory;
 
     public Student(int id, String fn, String ln, String displayName, int gender, double experienceLevel, boolean same, boolean more, boolean less, boolean solo, boolean collab) {
         this.wantsLess = less;
@@ -140,11 +142,25 @@ public class Student {
         return penalty;
     }
 
+    public int timesSatWith(String id) {
+        return (partnerHistory.containsKey(id)?partnerHistory.get(id):0);
+    }
+
     private boolean largeExperienceDifference(Student other) {
         return Math.abs(compareExperience(other)) > LARGE_EXP_DIFF_THRESHOLD;
     }
 
     private double compareExperience(Student other) {
         return this.getExperienceLevel() - other.getExperienceLevel();
+    }
+
+    public void recordSittingWith(Student seat) {
+        String id = ""+seat.getId();
+        if (!partnerHistory.containsKey(id)) {
+            partnerHistory.put(id, 1);
+        } else {
+            int num = partnerHistory.get(id);
+            partnerHistory.put(id, num+1);
+        }
     }
 }

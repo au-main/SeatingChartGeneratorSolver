@@ -18,7 +18,6 @@ public class Main extends PApplet {
     private static final int LIST_DISPLAY = 0;
 
     private int studentsPerGroup = 3;
-
     private int currentSelectionIndex = -1;
 
     SeatingChart chart = new SeatingChart(studentsPerGroup);
@@ -163,6 +162,10 @@ public class Main extends PApplet {
     public void keyReleased() {
         if (key == 'r' || key == 'R') {
             reshuffle();
+        }
+
+        if (key == 'u' || key == 'U') {     // USE
+            chart.save();
         }
     }
 

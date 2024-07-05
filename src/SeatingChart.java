@@ -146,4 +146,12 @@ public class SeatingChart {
         }
         return penalty;
     }
+
+    public void save() {
+        for (Group group : groups) {
+            group.updatePartnerHistories();
+        }
+
+        // TODO: save this in an appropriately named file
+    }
 }
