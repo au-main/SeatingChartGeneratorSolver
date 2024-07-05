@@ -86,7 +86,7 @@ public class SeatingChart {
 
     private void clearGroupAssignments() {
         for (Group desk : this.groups) {
-            desk.clear();
+            desk.clearExceptFrozen();
         }
     }
 

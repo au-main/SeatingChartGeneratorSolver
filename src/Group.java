@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Group {
@@ -8,6 +7,8 @@ public class Group {
     private static int nextId = 1;
     private int id;
     private Student[] seats;
+    private boolean[] frozen;
+
     private int groupSize;
     private SeatingChart chart;
 
@@ -16,6 +17,7 @@ public class Group {
         this.chart = chart;
         this.groupSize = students.length;
         seats = Arrays.copyOf(students, students.length);
+        frozen = new boolean[seats.length];
     }
 
     public Group(SeatingChart chart, int studentsPerGroup) {
@@ -129,8 +131,10 @@ public class Group {
         return null;
     }
 
-    public void clear() {
-        seats = new Student[seats.length];
+    public void clearExceptFrozen() {
+        for (int i = 0; i < seats.length; i++) {
+            if (!frozen[i]) seats[i] = null;
+        }
     }
 
     public boolean isEmpty() {

@@ -40,7 +40,7 @@ public class Main extends PApplet {
         float strDescent = textDescent();
         textHeight = strAscent + strDescent;
         boxHeight = textHeight + verticalBuffer;
-        numNamesPerCol = (int) (studentsPerGroup*(height - TOP_BUFF) / boxHeight);
+        numNamesPerCol = (int) (studentsPerGroup * (height - TOP_BUFF) / boxHeight);
 
         try {
             ArrayList<Student> studentData = loadStudents(file);
@@ -52,7 +52,7 @@ public class Main extends PApplet {
         }
 
         numColumns = (int) (chart.getStudents().size() / numNamesPerCol) + 1;
-        columnWidth = (width-LEFT_BUFF) / numColumns;
+        columnWidth = (width - LEFT_BUFF) / numColumns;
 
         chart.assignRandomly();
         displayList = makeDisplayListFor(chart);
@@ -131,7 +131,7 @@ public class Main extends PApplet {
             box.draw(this);
 
             if (box.isMouseOver(mouseX, mouseY)) {
-                box.highlight(this, color(0,255,0));
+                box.highlight(this, color(0, 255, 0));
             }
         }
 
@@ -147,7 +147,7 @@ public class Main extends PApplet {
         fill(0);
         stroke(0);
         for (int i = 0; i < studentsPerGroup; i++) {
-            text("seat " + (i+1), LEFT_BUFF + i*(columnWidth/studentsPerGroup), 10);
+            text("seat " + (i + 1), LEFT_BUFF + i * (columnWidth / studentsPerGroup), 10);
         }
     }
 
@@ -155,11 +155,19 @@ public class Main extends PApplet {
         fill(0);
         stroke(0);
         for (int i = 1; i <= displayList.size(); i++) {
-            text(""+i, 5,TOP_BUFF + (i-1)*boxHeight);
+            text("" + i, 5, TOP_BUFF + (i - 1) * boxHeight);
         }
     }
 
     public void keyReleased() {
+        if (key == 'f' || key == 'F') {
+            for (DisplayBox box : displayList) {
+                if (box.isMouseOver(mouseX, mouseY)) {
+                    box.toggleFreezeNameFor(mouseX, mouseY);
+                }
+            }
+        }
+
         if (key == 'r' || key == 'R') {
             reshuffle();
         }

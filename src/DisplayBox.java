@@ -160,4 +160,8 @@ public class DisplayBox {
         int width = getMaxRowWidth(window);
         this.w = width;
     }
+
+    public void toggleFreezeNameFor(int mouseX, int mouseY) {
+
+    }
 }
