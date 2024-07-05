@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Group {
@@ -131,10 +132,15 @@ public class Group {
         return null;
     }
 
-    public void clearExceptFrozen() {
+    public ArrayList<Student> clearExceptFrozen() {
+        ArrayList<Student> cleared = new ArrayList<>();
         for (int i = 0; i < seats.length; i++) {
-            if (!frozen[i]) seats[i] = null;
+            if (!frozen[i] && seats[i] != null) {
+                cleared.add(seats[i]);
+                seats[i] = null;
+            }
         }
+        return cleared;
     }
 
     public boolean isEmpty() {
@@ -227,5 +233,13 @@ public class Group {
                 seats[j].recordSittingWith(seats[i]);
             }
         }
+    }
+
+    public void toggleFreeze(int position) {
+        frozen[position] = !frozen[position];
+    }
+
+    public boolean isFrozen(int position) {
+        return frozen[position];
     }
 }

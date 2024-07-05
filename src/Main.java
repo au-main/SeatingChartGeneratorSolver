@@ -28,7 +28,7 @@ public class Main extends PApplet {
     int columnWidth;
 
     int displayMode = LIST_DISPLAY;
-    private String file = "DataFiles/block1.csv";
+    private String file = "DataFiles/shortTest.csv";
 
     public void settings() {
         size(1000, 1000);

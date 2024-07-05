@@ -71,23 +71,26 @@ public class SeatingChart {
     }
 
     public void assignRandomly() {
-        clearGroupAssignments();
+        ArrayList<Student> cleard = clearGroupAssignments();
 
-        Collections.shuffle(this.students);
+        Collections.shuffle(cleard);
         int nextStudent = 0;
         for (Group group : groups) {
-            for (int n = 0; n < studentsPerGroup; n++) {
-                group.add(students.get(nextStudent));
+            while (group.hasSpace()) {
+                group.add(cleard.get(nextStudent));
                 nextStudent++;
-                if (nextStudent >= students.size()) return;
+                if (nextStudent >= cleard.size()) return;
             }
         }
     }
 
-    private void clearGroupAssignments() {
+    private ArrayList<Student> clearGroupAssignments() {
+        ArrayList<Student> cleared = new ArrayList<>();
         for (Group desk : this.groups) {
-            desk.clearExceptFrozen();
+            ArrayList<Student> removed = desk.clearExceptFrozen();
+            if (removed.size() > 0) cleared.addAll(removed);
         }
+        return cleared;
     }
 
     public void addStudents(ArrayList<Student> studentData) {

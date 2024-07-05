@@ -81,6 +81,13 @@ public class DisplayBox {
         int position = 0;
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
+                if (desk.isFrozen(position)) {
+                    window.fill(255,0,0);
+                    window.stroke(255,0,0);
+                } else {
+                    window.fill(0);
+                    window.stroke(0);
+                }
                 window.text(getName(position), (int)(x + col*(w/(double)cols)), (int)(y + row*(h/(double)rows)));
                 position++;
             }
@@ -162,6 +169,23 @@ public class DisplayBox {
     }
 
     public void toggleFreezeNameFor(int mouseX, int mouseY) {
+        int position = 0;
+        double boxWidth = w/(double)cols;
+        double boxHeight = h/(double)rows;
 
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                double x1 = (x + col*(w/(double)cols));
+                double y1 = (y + row*(h/(double)rows));
+                double x2 = x1 + boxWidth;
+                double y2 = y1 + boxHeight;
+                if (x1 <= mouseX && mouseX <= x2) {
+                    if (y1 <= mouseY && mouseY <= y2) {
+                        desk.toggleFreeze(position);
+                    }
+                }
+                position++;
+            }
+        }
     }
 }
