@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /*
 TODO: adjust font smaller automatically (or clip names) ?
-
  */
 
 public class Main extends PApplet {
@@ -18,6 +19,8 @@ public class Main extends PApplet {
 
     private int studentsPerGroup = 3;
 
+    private int currentSelectionIndex = -1;
+
     SeatingChart chart = new SeatingChart(studentsPerGroup);
     ArrayList<DisplayBox> displayList = new ArrayList<DisplayBox>();
     float verticalBuffer = 10;
@@ -27,7 +30,6 @@ public class Main extends PApplet {
 
     int displayMode = LIST_DISPLAY;
     private String file = "DataFiles/block1.csv";
-
 
     public void settings() {
         size(1000, 1000);
@@ -77,6 +79,34 @@ public class Main extends PApplet {
         return out;
     }
 
+    // TODO: make one for saving partner records
+    // TODO: on load, if no partner records make an empty one
+    // TODO: if key 'u' for use, automatically update partner records
+    // TODO: way to save/revisit history of charts.
+
+    private HashMap<String, HashSet<String>> loadOldPartnerRecords(String filePath) throws IOException {
+        HashMap<String, HashSet<String>> partnerRecords = new HashMap<String, HashSet<String>>();
+        String file = readFile(filePath);
+        String[] lines = file.split("\n");
+
+        for (String line : lines) {
+            line = line.trim();
+            try {
+                String[] vals = line.split(",");
+                String id = vals[1];  // vals[0] is for name, not used
+                HashSet<String> partners = new HashSet<>();
+                for (int i = 2; i < vals.length; i++) {
+                    partners.add(vals[i]);
+                }
+                partnerRecords.put(id, partners);
+            } catch (Exception e) {
+                System.err.println("Error making student from line: " + line);
+            }
+        }
+
+        return partnerRecords;
+    }
+
     private ArrayList<Student> loadStudents(String filePath) throws IOException {
         ArrayList<Student> students = new ArrayList<>();
         String file = readFile(filePath);
@@ -98,25 +128,33 @@ public class Main extends PApplet {
     public void draw() {
         background(255);
 
-        drawRowNumbers();
-        drawColHeaders();
-
         for (DisplayBox box : displayList) {
             box.draw(this);
 
             if (box.isMouseOver(mouseX, mouseY)) {
-                box.highlight(this);
+                box.highlight(this, color(0,255,0));
             }
         }
+
+        if (currentSelectionIndex >= 0) {
+            displayList.get(currentSelectionIndex).highlight(this, color(0, 255, 255));
+        }
+
+        drawRowNumbers();
+        drawColHeaders();
     }
 
     private void drawColHeaders() {
+        fill(0);
+        stroke(0);
         for (int i = 0; i < studentsPerGroup; i++) {
             text("seat " + (i+1), LEFT_BUFF + i*(columnWidth/studentsPerGroup), 10);
         }
     }
 
     private void drawRowNumbers() {
+        fill(0);
+        stroke(0);
         for (int i = 1; i <= displayList.size(); i++) {
             text(""+i, 5,TOP_BUFF + (i-1)*boxHeight);
         }
@@ -135,6 +173,27 @@ public class Main extends PApplet {
             }
             displayList = makeDisplayListFor(chart);
         }
+
+        if (mouseButton == LEFT) {
+            if (currentSelectionIndex >= 0) {
+                int clickedIndex = getClickedBox(mouseX, mouseY);
+                DisplayBox clickedBox = displayList.get(clickedIndex);
+                if (clickedBox == null) return;
+                DisplayBox selectedBox = displayList.get(currentSelectionIndex);
+                DisplayBox.swapLocations(clickedBox, selectedBox);
+                currentSelectionIndex = -1;
+            } else {
+                currentSelectionIndex = getClickedBox(mouseX, mouseY);
+            }
+        }
+    }
+
+    private int getClickedBox(int mouseX, int mouseY) {
+        for (int i = 0; i < displayList.size(); i++) {
+            DisplayBox box = displayList.get(i);
+            if (box.isMouseOver(mouseX, mouseY)) return i;
+        }
+        return -1;
     }
 
     private void reshuffle() {

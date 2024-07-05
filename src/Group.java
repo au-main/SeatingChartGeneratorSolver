@@ -158,9 +158,25 @@ public class Group {
         delete(RIGHT);
     }
 
-    // TODO: re-think this with 3 or more people =\
+/*    // TODO: re-think this with 3 or more people =\
     public double getPenalty() {
         double penalty = 0;
+        if (getLeft() != null) {
+            penalty += getLeft().matchScoreWith(getRight());
+        }
+        if (getRight() != null) {
+            penalty += getRight().matchScoreWith(getLeft());
+        }
+
+        return penalty;
+    }*/
+
+    // TODO: penalities
+    // sitting with same partners
+
+    public double getPenalty() {
+        double penalty = 0;
+
         if (getLeft() != null) {
             penalty += getLeft().matchScoreWith(getRight());
         }

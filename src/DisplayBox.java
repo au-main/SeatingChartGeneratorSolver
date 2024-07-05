@@ -17,6 +17,21 @@ public class DisplayBox {
         this.desk = desk;
     }
 
+    public static void swapLocations(DisplayBox b1, DisplayBox b2) {
+        int x = b1.x;
+        int y = b1.y;
+        int w = b1.w;
+        int h = b1.h;
+        b1.x = b2.x;
+        b1.y = b2.y;
+        b1.w = b2.w;
+        b1.h = b2.h;
+        b2.x = x;
+        b2.y = y;
+        b2.w = w;
+        b2.h = h;
+    }
+
     public int getX() {
         return x;
     }
@@ -111,10 +126,10 @@ public class DisplayBox {
         this.desk.delete(r*cols+c);
     }
 
-    public void highlight(PApplet window) {
+    public void highlight(PApplet window, int color) {
         window.fill(0,0,0,0);
-        window.stroke(0,255,0);
-        window.rect(x, y, w, h);
+        window.stroke(color);
+        window.rect(x+1, y+1, w-2, h-2);
     }
 
     private int positionFor(int row, int col) {
