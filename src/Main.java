@@ -16,6 +16,7 @@ public class Main extends PApplet {
     private static final int TOP_BUFF = 80;
     private static final int LEFT_BUFF = 80;
     private static final int LIST_DISPLAY = 0;
+    private static final int NUM_TO_SEARCH = 1000000;
 
     private int studentsPerGroup = 3;
     private int currentSelectionIndex = -1;
@@ -31,6 +32,7 @@ public class Main extends PApplet {
     private String BASE_PATH = "DataFiles/";
     private String file = "block2.csv";
     private boolean displayConflicts = false;
+    private double currentScore = -1;
 
     public void settings() {
         size(1000, 1000);
@@ -59,6 +61,7 @@ public class Main extends PApplet {
 
         chart.assignRandomly();
         displayList = makeDisplayListFor(chart);
+        currentScore = chart.getScore();
     }
 
     private ArrayList<DisplayBox> makeDisplayListFor(SeatingChart chart) {
@@ -144,6 +147,12 @@ public class Main extends PApplet {
 
         drawRowNumbers();
         drawColHeaders();
+
+        if (currentScore >= 0) {
+            fill(0);
+            stroke(0);
+            text("Score: " + currentScore, 10, height - 40);
+        }
     }
 
     private void drawColHeaders() {
@@ -177,12 +186,36 @@ public class Main extends PApplet {
 
         if (key == 'r' || key == 'R') {
             reshuffle();
+            currentScore = chart.getScore();
+        }
+
+        if (key == 'o' || key == 'O') {
+            SeatingChart best = randomSearchForBestChart(NUM_TO_SEARCH);
+            chart = best;
+            displayList = makeDisplayListFor(chart);
+            currentScore = chart.getScore();
         }
 
         if (key == 'u' || key == 'U') {     // USE
             String baseFileName = file.substring(0, file.indexOf("."));
             chart.save(BASE_PATH, baseFileName);
         }
+    }
+
+    private SeatingChart randomSearchForBestChart(int numToSearch) {
+        double minScore = Double.MAX_VALUE;
+        SeatingChart bestChart = null;
+
+        for (int i = 0; i < numToSearch; i++) {
+            chart.assignRandomly();
+            double score = chart.getScore();
+            if (score < minScore) {
+                minScore = score;
+                bestChart = new SeatingChart(chart);
+            }
+        }
+
+        return bestChart;
     }
 
     public void mouseReleased() {

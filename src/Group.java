@@ -14,6 +14,20 @@ public class Group {
     private int groupSize;
     private SeatingChart chart;
 
+    public Group(Group toCopy) {
+        this.groupSize = toCopy.groupSize;
+        this.chart = toCopy.chart;
+        this.id = toCopy.id;
+        this.seats = new Student[toCopy.groupSize];
+        for (int i = 0; i < seats.length; i++) {
+            seats[i] = toCopy.seats[i];
+        }
+        this.frozen = new boolean[toCopy.groupSize];
+        for (int i = 0; i < groupSize; i++) {
+            frozen[i] = toCopy.frozen[i];
+        }
+    }
+
     public Group(SeatingChart chart, Student... students) {
         this.id = nextId++;
         this.chart = chart;

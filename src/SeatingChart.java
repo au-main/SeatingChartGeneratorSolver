@@ -10,6 +10,15 @@ public class SeatingChart {
     private ArrayList<Student> students;
     private int studentsPerGroup;
 
+    public SeatingChart(SeatingChart toCopy) {
+        this.groups = new ArrayList<>();
+        for (Group g : toCopy.groups) {
+            this.groups.add( new Group( g ) );
+        }
+        this.students = toCopy.students;
+        this.studentsPerGroup = toCopy.studentsPerGroup;
+    }
+
     public SeatingChart(int studentsPerGroup) {
         students = new ArrayList<>();
         groups = new ArrayList<>();
@@ -181,7 +190,8 @@ public class SeatingChart {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        };
+        }
+        ;
     }
 
     private void saveSeatingChartToFile(String filePath) {
@@ -226,7 +236,7 @@ public class SeatingChart {
     public void savePartnerHistoryToFile(String filePath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Student student : this.students) {
-                writer.write(student.getFn() + " " + student.getLn().substring(0, 1) + ", " + student.getId() );
+                writer.write(student.getFn() + " " + student.getLn().substring(0, 1) + ", " + student.getId());
 
                 for (Map.Entry<String, Integer> entry : student.getPartnerHistory().entrySet()) {
                     writer.write(", " + entry.getKey() + "," + entry.getValue());
@@ -261,7 +271,7 @@ public class SeatingChart {
                 student.clearPartnerHistory();
                 for (int i = 2; i < parts.length; i += 2) {
                     String idStr = parts[i].trim();
-                    int num = Integer.parseInt(parts[i+1].trim());
+                    int num = Integer.parseInt(parts[i + 1].trim());
                     student.setPartnerHistoryFor(idStr, num);
                 }
             }
