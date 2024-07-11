@@ -29,7 +29,8 @@ public class Main extends PApplet {
 
     int displayMode = LIST_DISPLAY;
     private String BASE_PATH = "DataFiles/";
-    private String file = "block99.csv";
+    private String file = "block2.csv";
+    private boolean displayConflicts = false;
 
     public void settings() {
         size(1000, 1000);
@@ -130,7 +131,7 @@ public class Main extends PApplet {
         background(255);
 
         for (DisplayBox box : displayList) {
-            box.draw(this);
+            box.draw(this, displayConflicts);
 
             if (box.isMouseOver(mouseX, mouseY)) {
                 box.highlight(this, color(0, 255, 0));
@@ -168,6 +169,10 @@ public class Main extends PApplet {
                     box.toggleFreezeNameFor(mouseX, mouseY);
                 }
             }
+        }
+
+        if (key == 'd' || key == 'D') {
+            displayConflicts = !displayConflicts;
         }
 
         if (key == 'r' || key == 'R') {

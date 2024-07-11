@@ -3,11 +3,12 @@ import processing.core.PApplet;
 public class DisplayBox {
     private static final boolean DRAW_BORDER = true;
     private static final float HORIZ_BUFFER = 20;
+    private static final float MAX_PENALTY = 100;
     private int x, y, w, h;
     private int rows, cols;     // how names are organized within the box
     private Group desk;
 
-    public DisplayBox(int x, int y,int w, int h, int rows, int cols, Group desk) {
+    public DisplayBox(int x, int y, int w, int h, int rows, int cols, Group desk) {
         this.x = x;
         this.y = y;
         this.h = h;
@@ -70,9 +71,15 @@ public class DisplayBox {
     }
 */
 
-    public void draw(PApplet window) {
+    public void draw(PApplet window, boolean shadeConstraintViolations) {
         window.fill(255);
         window.stroke(255);
+
+        if (shadeConstraintViolations) {
+            float val = 255 * window.map((float) desk.getPenalty(), 0, MAX_PENALTY, 0, 1);
+            window.fill(255, 255 - val, 255 - val);
+        }
+
         if (DRAW_BORDER)
             window.rect(x, y, w, h);
         window.fill(0);
@@ -82,33 +89,38 @@ public class DisplayBox {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 if (desk.isFrozen(position)) {
-                    window.fill(255,0,0);
-                    window.stroke(255,0,0);
+                    window.fill(255, 0, 0);
+                    window.stroke(255, 0, 0);
                 } else {
                     window.fill(0);
                     window.stroke(0);
                 }
-                window.text(getName(position), (int)(x + col*(w/(double)cols)), (int)(y + row*(h/(double)rows)));
+
+                window.text(getName(position), (int) (x + col * (w / (double) cols)), (int) (y + row * (h / (double) rows)));
                 position++;
             }
         }
     }
 
+    public void draw(PApplet window) {
+        draw(window, false);
+    }
+
     public String getName(int position) {
-        return (this.desk.get(position) != null)?this.desk.get(position).getDisplayName():" no one";
+        return (this.desk.get(position) != null) ? this.desk.get(position).getDisplayName() : " no one";
     }
 
     public boolean isMouseOver(int mousex, int mousey) {
-        return (x < mousex && mousex < x + w) && (y < mousey && mousey < y+h);
+        return (x < mousex && mousex < x + w) && (y < mousey && mousey < y + h);
     }
 
     public int[] getNameBoxIndicies(int mouseX, int mouseY) {
         if (!isMouseOver(mouseX, mouseY)) return null;
 
-        int r = (int)((mouseY - y)/(h/(double)rows));
-        int c = (int)((mouseX - x)/(w/(double)cols));
+        int r = (int) ((mouseY - y) / (h / (double) rows));
+        int c = (int) ((mouseX - x) / (w / (double) cols));
 
-        return new int[] {r, c};
+        return new int[]{r, c};
     }
 
     public void mouseOverHighlight(int mouseX, int mouseY, PApplet window) {
@@ -120,7 +132,7 @@ public class DisplayBox {
 
         window.fill(255);
         window.stroke(window.color(255, 255, 128)); // yellow highlight
-        window.rect(x+(int)(c*((double)w/cols)), y+(int)(r*((double)h/rows)), (int)(w/cols), (int)(h/rows) );
+        window.rect(x + (int) (c * ((double) w / cols)), y + (int) (r * ((double) h / rows)), (int) (w / cols), (int) (h / rows));
     }
 
     public void handleMouseClick(int mouseX, int mouseY, PApplet window) {
@@ -130,17 +142,17 @@ public class DisplayBox {
         int r = indicies[0];
         int c = indicies[1];
 
-        this.desk.delete(r*cols+c);
+        this.desk.delete(r * cols + c);
     }
 
     public void highlight(PApplet window, int color) {
-        window.fill(0,0,0,0);
+        window.fill(0, 0, 0, 0);
         window.stroke(color);
-        window.rect(x+1, y+1, w-2, h-2);
+        window.rect(x + 1, y + 1, w - 2, h - 2);
     }
 
     private int positionFor(int row, int col) {
-        return row*cols+col;
+        return row * cols + col;
     }
 
     private int getMaxRowWidth(PApplet window) {
@@ -150,8 +162,8 @@ public class DisplayBox {
             int rowWidth = 0;
             for (int col = 0; col < cols; col++) {
                 Student s = desk.get(positionFor(row, col));
-                String name = (s == null)?" no one":s.getDisplayName();
-                rowWidth += window.textWidth( name ) + HORIZ_BUFFER;
+                String name = (s == null) ? " no one" : s.getDisplayName();
+                rowWidth += window.textWidth(name) + HORIZ_BUFFER;
             }
             rowWidth -= HORIZ_BUFFER;       // because we don't want buffer on the right
 
@@ -170,13 +182,13 @@ public class DisplayBox {
 
     public void toggleFreezeNameFor(int mouseX, int mouseY) {
         int position = 0;
-        double boxWidth = w/(double)cols;
-        double boxHeight = h/(double)rows;
+        double boxWidth = w / (double) cols;
+        double boxHeight = h / (double) rows;
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                double x1 = (x + col*(w/(double)cols));
-                double y1 = (y + row*(h/(double)rows));
+                double x1 = (x + col * (w / (double) cols));
+                double y1 = (y + row * (h / (double) rows));
                 double x2 = x1 + boxWidth;
                 double y2 = y1 + boxHeight;
                 if (x1 <= mouseX && mouseX <= x2) {
