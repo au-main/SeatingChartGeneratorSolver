@@ -1,8 +1,4 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import com.sun.org.apache.xpath.internal.operations.Equals;
-
 import java.util.HashMap;
-import java.util.Locale;
 
 public class Student {
     private static final double LARGE_EXP_DIFF_THRESHOLD = 2;
@@ -33,6 +29,7 @@ public class Student {
         this.displayName = displayName;
         this.gender = gender;
         this.experienceLevel = experienceLevel;
+        this.partnerHistory = new HashMap<>();
     }
 
     public static Student makeStudentFromRow(String line) throws Exception {
@@ -72,8 +69,8 @@ public class Student {
         return 0;
     }
 
-    public int getId() {
-        return id;
+    public String getId() {
+        return ""+id;
     }
 
     public void setId(int id) {
@@ -162,5 +159,17 @@ public class Student {
             int num = partnerHistory.get(id);
             partnerHistory.put(id, num+1);
         }
+    }
+
+    public HashMap<String, Integer> getPartnerHistory() {
+        return this.partnerHistory;
+    }
+
+    public void clearPartnerHistory() {
+        this.partnerHistory.clear();
+    }
+
+    public void setPartnerHistoryFor(String idStr, int num) {
+        this.partnerHistory.put(idStr, num);
     }
 }

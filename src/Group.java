@@ -1,3 +1,4 @@
+import javax.sql.rowset.FilteredRowSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -35,6 +36,28 @@ public class Group {
 
     public Group(Student left, Student right, SeatingChart chart) {
         this(chart, new Student[]{left, right});        // constructor for backward compatability
+    }
+
+    public Group(SeatingChart chart, String csvRow, ArrayList<Student> students) {
+        this.chart = chart;
+        String[] vals = csvRow.split(",");
+        this.groupSize = Integer.parseInt(vals[0]);
+        this.id = nextId++;
+        seats = new Student[groupSize];
+        frozen = new boolean[groupSize];
+
+        for (int i = 1; i < vals.length; i++) {
+            Student s = getStudentWith(vals[i], students);
+            seats[i-1] = s;
+        }
+    }
+
+    private Student getStudentWith(String val, ArrayList<Student> students) {
+        if (val.equals("null")) return null;
+        for (Student student : students) {
+            if (val.equals(student.getId())) return student;
+        }
+        return null;
     }
 
     public Student get(int position) {
@@ -241,5 +264,18 @@ public class Group {
 
     public boolean isFrozen(int position) {
         return frozen[position];
+    }
+
+    public int getGroupSize() {
+        return this.groupSize;
+    }
+
+    public String getCsvString() {
+        String row = "" + this.getGroupSize() + ",";
+        for (Student student : seats) {
+            row += (student == null?"null":student.getId()) + ",";
+        }
+        row = row.substring(0, row.length()-1); // remove last comma
+        return row;
     }
 }

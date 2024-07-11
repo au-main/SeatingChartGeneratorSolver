@@ -28,7 +28,8 @@ public class Main extends PApplet {
     int columnWidth;
 
     int displayMode = LIST_DISPLAY;
-    private String file = "DataFiles/shortTest.csv";
+    private String BASE_PATH = "DataFiles/";
+    private String file = "block99.csv";
 
     public void settings() {
         size(1000, 1000);
@@ -43,10 +44,11 @@ public class Main extends PApplet {
         numNamesPerCol = (int) (studentsPerGroup * (height - TOP_BUFF) / boxHeight);
 
         try {
-            ArrayList<Student> studentData = loadStudents(file);
+            ArrayList<Student> studentData = loadStudents(BASE_PATH + file);
             System.out.println(studentData);
-
             chart.addStudents(studentData);
+            String partnerHistoryFileName = file.substring(0, file.indexOf(".")) + "-partnerHistories.csv";
+            chart.loadPartnerHistoryFromFile(BASE_PATH + partnerHistoryFileName);
         } catch (IOException e) {
             System.err.println("Couldn't read the file: " + file);
         }
@@ -173,7 +175,8 @@ public class Main extends PApplet {
         }
 
         if (key == 'u' || key == 'U') {     // USE
-            chart.save();
+            String baseFileName = file.substring(0, file.indexOf("."));
+            chart.save(BASE_PATH, baseFileName);
         }
     }
 

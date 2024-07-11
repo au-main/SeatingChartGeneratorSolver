@@ -1,5 +1,9 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SeatingChart {
     private ArrayList<Group> groups;
@@ -150,11 +154,126 @@ public class SeatingChart {
         return penalty;
     }
 
-    public void save() {
+    public void save(String pathToFile, String baseName) {
         for (Group group : groups) {
             group.updatePartnerHistories();
         }
 
-        // TODO: save this in an appropriately named file
+        String partnerHistoryFileName = baseName + "-" + "partnerHistories.csv";
+        savePartnerHistoryToFile(pathToFile + partnerHistoryFileName);
+
+        // TODO: check if resulitng file includes full filepath
+        String seatingChartName = getNextSequentialFilename(pathToFile, baseName);
+        saveSeatingChartToFile(pathToFile + seatingChartName);
+    }
+
+    /***
+     * Must be run after students have been loaded as we look up student objects based on their ids in the saved chart
+     * @param filePath
+     */
+    private void loadSeatingChartFromFile(String filePath) {
+        this.groups.clear();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Group group = new Group(this, line, students);
+                groups.add(group);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        };
+    }
+
+    private void saveSeatingChartToFile(String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (Group group : this.groups) {
+                String row = group.getCsvString();
+                writer.write(row);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Couldn't save seating chart");
+            System.err.println(e);
+        }
+    }
+
+    public static String getNextSequentialFilename(String directoryPath, String baseName) {
+        File dir = new File(directoryPath);
+        File[] files = dir.listFiles();
+
+        if (files == null) {
+            throw new IllegalArgumentException("The directory does not exist or is not a directory.");
+        }
+
+        int maxNumber = -1;
+        Pattern pattern = Pattern.compile(Pattern.quote(baseName) + "-(\\d{2})\\.csv");
+
+        for (File file : files) {
+            Matcher matcher = pattern.matcher(file.getName());
+            if (matcher.matches()) {
+                int number = Integer.parseInt(matcher.group(1));
+                if (number > maxNumber) {
+                    maxNumber = number;
+                }
+            }
+        }
+
+        int nextNumber = maxNumber + 1;
+        return String.format("%s-%02d.csv", baseName, nextNumber);
+    }
+
+    // Method to save the contents of partnerHistory to a file
+    public void savePartnerHistoryToFile(String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (Student student : this.students) {
+                writer.write(student.getFn() + " " + student.getLn().substring(0, 1) + ", " + student.getId() );
+
+                for (Map.Entry<String, Integer> entry : student.getPartnerHistory().entrySet()) {
+                    writer.write(", " + entry.getKey() + "," + entry.getValue());
+                }
+
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Couldn't save partner histories");
+            System.err.println(e);
+        }
+    }
+
+    /***
+     * Loads partner history from file.  To be run only after student objects have been created since it looks up
+     * existing student object to fill in partner history info.
+     * @param filePath
+     * @throws IOException
+     */
+    public void loadPartnerHistoryFromFile(String filePath) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                String id = parts[1].trim();
+                Student student = getStudent(id);
+                if (student == null) {
+                    System.err.println("Could not find student object for " + parts[0] + ": " + parts[1]);
+                    continue;
+                }
+
+                student.clearPartnerHistory();
+                for (int i = 2; i < parts.length; i += 2) {
+                    String idStr = parts[i].trim();
+                    int num = Integer.parseInt(parts[i+1].trim());
+                    student.setPartnerHistoryFor(idStr, num);
+                }
+            }
+        }
+    }
+
+    private Student getStudent(String id) {
+        for (Student s : students) {
+            if (s.getId().equals(id)) {
+                return s;
+            }
+        }
+        return null;
     }
 }
