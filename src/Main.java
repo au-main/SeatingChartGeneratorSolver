@@ -1,3 +1,4 @@
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import processing.core.PApplet;
 
 import java.io.IOException;
@@ -33,9 +34,11 @@ public class Main extends PApplet {
     private String file = "block2.csv";
     private boolean displayConflicts = false;
     private double currentScore = -1;
+    private int currentChartIndex = -1;
+    private int maxChartIndex = -1;
 
     public void settings() {
-        size(1000, 1000);
+        size(1000, 800);
     }
 
     public void setup() {
@@ -52,6 +55,9 @@ public class Main extends PApplet {
             chart.addStudents(studentData);
             String partnerHistoryFileName = file.substring(0, file.indexOf(".")) + "-partnerHistories.csv";
             chart.loadPartnerHistoryFromFile(BASE_PATH + partnerHistoryFileName);
+            String baseFileName = file.substring(0, file.indexOf("."));
+            String nextNum = SeatingChart.getNumForNextSequentialFilename(BASE_PATH, baseFileName);
+            this.maxChartIndex = Integer.parseInt(nextNum);
         } catch (IOException e) {
             System.err.println("Couldn't read the file: " + file);
         }
@@ -153,6 +159,12 @@ public class Main extends PApplet {
             stroke(0);
             text("Score: " + currentScore, 10, height - 40);
         }
+
+        if (currentChartIndex >= 0) {
+            fill(0);
+            stroke(0);
+            text("Chart " + currentChartIndex + " of " + (maxChartIndex-1), width/2, height - 40);
+        }
     }
 
     private void drawColHeaders() {
@@ -172,6 +184,33 @@ public class Main extends PApplet {
     }
 
     public void keyReleased() {
+        if (keyCode == UP) {
+            currentChartIndex++;
+            if (currentChartIndex >= maxChartIndex) {
+                currentChartIndex = maxChartIndex-1;
+            }
+
+            String basename = file.substring(0, file.indexOf("."));     // TODO: clean up many times we do this
+            String nextChartName = basename + "-" + String.format("%02d", currentChartIndex) + ".csv";
+            chart.loadSeatingChartFromFile(BASE_PATH + nextChartName);
+            displayList = makeDisplayListFor(chart);
+            currentScore = chart.getScore();                            // TODO: clean up having to remember to makeDisplayLIst For
+                                                                        // make more helper methods to make this cleaner
+        }
+
+        if (keyCode == DOWN) {
+            currentChartIndex--;
+            if (currentChartIndex < 0) {
+                currentChartIndex = 0;
+            }
+
+            String basename = file.substring(0, file.indexOf("."));
+            String nextChartName = basename + "-" + String.format("%02d", currentChartIndex) + ".csv";
+            chart.loadSeatingChartFromFile(BASE_PATH + nextChartName);
+            displayList = makeDisplayListFor(chart);
+            currentScore = chart.getScore();
+        }
+
         if (key == 'f' || key == 'F') {
             for (DisplayBox box : displayList) {
                 if (box.isMouseOver(mouseX, mouseY)) {
@@ -187,6 +226,7 @@ public class Main extends PApplet {
         if (key == 'r' || key == 'R') {
             reshuffle();
             currentScore = chart.getScore();
+            currentChartIndex = -1;
         }
 
         if (key == 'o' || key == 'O') {
@@ -194,11 +234,14 @@ public class Main extends PApplet {
             chart = best;
             displayList = makeDisplayListFor(chart);
             currentScore = chart.getScore();
+            currentChartIndex = -1;
         }
 
         if (key == 'u' || key == 'U') {     // USE
             String baseFileName = file.substring(0, file.indexOf("."));
             chart.save(BASE_PATH, baseFileName);
+            currentChartIndex = maxChartIndex;
+            maxChartIndex++;
         }
     }
 

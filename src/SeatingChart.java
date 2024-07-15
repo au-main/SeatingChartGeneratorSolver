@@ -180,7 +180,7 @@ public class SeatingChart {
      * Must be run after students have been loaded as we look up student objects based on their ids in the saved chart
      * @param filePath
      */
-    private void loadSeatingChartFromFile(String filePath) {
+    public void loadSeatingChartFromFile(String filePath) {
         this.groups.clear();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -208,6 +208,11 @@ public class SeatingChart {
     }
 
     public static String getNextSequentialFilename(String directoryPath, String baseName) {
+        String nextNumber = getNumForNextSequentialFilename(directoryPath, baseName);
+        return baseName + "-" + nextNumber + ".csv";
+    }
+
+    public static String getNumForNextSequentialFilename(String directoryPath, String baseName) {
         File dir = new File(directoryPath);
         File[] files = dir.listFiles();
 
@@ -229,8 +234,9 @@ public class SeatingChart {
         }
 
         int nextNumber = maxNumber + 1;
-        return String.format("%s-%02d.csv", baseName, nextNumber);
+        return String.format("%02d", nextNumber);
     }
+
 
     // Method to save the contents of partnerHistory to a file
     public void savePartnerHistoryToFile(String filePath) {
