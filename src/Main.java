@@ -9,13 +9,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /*
+TODO: add ability to turn on/off different penalities in the calculation
+TODO: add skill level mismatch penalities
+
 TODO: adjust font smaller automatically (or clip names) ?
 TODO: bug: if some charts have 2 per group and some 3, display doesn't change as we arrow through them
 TODO: add way to delete a chart that appropriately updates the partner histories
 
 TODO: switch display to match a room layout
 TODO: make color-coding for attainment (or other marking) so I can print and me/TA's can see
-
  */
 
 public class Main extends PApplet {

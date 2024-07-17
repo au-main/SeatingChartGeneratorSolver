@@ -57,12 +57,11 @@ public class Student {
 
     private static double averageGrades(String[] vals, int firstIndex, int lastIndex) {
         double sum = 0;
-
         for (int i = firstIndex; i <= lastIndex; i++) {
             sum += getValFor(vals[i]);
         }
 
-        return 10 * (sum / ((lastIndex - firstIndex + 1) * 4));
+        return (sum / (lastIndex - firstIndex + 1));
     }
 
     private static double getValFor(String grade) {
@@ -72,7 +71,12 @@ public class Student {
         if (grade.equals('c')) return 2;
         if (grade.equals('d')) return 1;
         if (grade.equals('f')) return 0;
-        return 0;
+        try {
+            int score = Integer.parseInt(grade.trim());
+            return score;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public String getId() {

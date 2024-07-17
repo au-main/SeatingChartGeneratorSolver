@@ -6,6 +6,7 @@ public class Group {
     private static final double[] PENALTY_LEVEL = {4, 16, 16*4, 16*16};
     private static final int LEFT = 0;
     private static final int RIGHT = 1;
+    private static final double SKILL_DIFF_THRESHOLD = 2;
     private static int nextId = 1;
     private int id;
     private Student[] seats;
@@ -206,24 +207,31 @@ public class Group {
         delete(RIGHT);
     }
 
-/*    // TODO: re-think this with 3 or more people =\
     public double getPenalty() {
         double penalty = 0;
-        if (getLeft() != null) {
-            penalty += getLeft().matchScoreWith(getRight());
-        }
-        if (getRight() != null) {
-            penalty += getRight().matchScoreWith(getLeft());
-        }
+
+        //penalty += getRepeatedPartnerPentalty();
+        //penalty += getAffinityGroupPenalty();
+        penalty += getSkillMismatchPenalty();
 
         return penalty;
-    }*/
+    }
 
-    public double getPenalty() {
+    private double getSkillMismatchPenalty() {
         double penalty = 0;
+        for (int i = 0; i < this.seats.length; i++) {
+            if (seats[i] == null) continue;
 
-        penalty += getRepeatedPartnerPentalty();
-        penalty += getAffinityGroupPenalty();
+            for (int j = i+1; j < seats.length; j++) {
+                if (seats[j] == null) continue;
+
+                double skillDiff = Math.abs(seats[i].getExperienceLevel() - seats[j].getExperienceLevel());
+                if (skillDiff > SKILL_DIFF_THRESHOLD) {
+                    penalty += PENALTY_LEVEL[2];
+                }
+            }
+        }
+
         return penalty;
     }
 
