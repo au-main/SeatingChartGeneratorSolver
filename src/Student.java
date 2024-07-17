@@ -11,13 +11,14 @@ public class Student {
 
     private int id;
     private String fn, ln, displayName;
-    private int gender;
+    private String gender;          // 'm', 'f', 'n'
+    private String wantsGender;     // 'm', blank means any, could also be 'nf'  for n or f
     private double experienceLevel;
     private boolean wantsSame, wantsMore, wantsLess;
     private boolean likesSolo, likeCollab;
     private HashMap<String, Integer> partnerHistory;
 
-    public Student(int id, String fn, String ln, String displayName, int gender, double experienceLevel, boolean same, boolean more, boolean less, boolean solo, boolean collab) {
+    public Student(int id, String fn, String ln, String displayName, double experienceLevel, boolean same, boolean more, boolean less, boolean solo, boolean collab, String gender, String wantsGender) {
         this.wantsLess = less;
         this.wantsMore = more;
         this.wantsSame = same;
@@ -28,6 +29,7 @@ public class Student {
         this.ln = ln;
         this.displayName = displayName;
         this.gender = gender;
+        this.wantsGender = wantsGender;
         this.experienceLevel = experienceLevel;
         this.partnerHistory = new HashMap<>();
     }
@@ -44,8 +46,12 @@ public class Student {
         boolean less = Boolean.parseBoolean(vals[11]);
         boolean solo = Boolean.parseBoolean(vals[12]);
         boolean collab = Boolean.parseBoolean(vals[13]);
-
-        Student s = new Student(id, fn, ln, fn + " " + ln.substring(0,1) + ".", 0, exp, same, more, less, solo, collab);
+        String gender = vals[15];
+        String wantsGender = "";
+        if (vals.length > 16) {
+            wantsGender = vals[16];
+        }
+        Student s = new Student(id, fn, ln, fn + " " + ln.substring(0, 1) + ".", exp, same, more, less, solo, collab, gender, wantsGender);
         return s;
     }
 
@@ -56,7 +62,7 @@ public class Student {
             sum += getValFor(vals[i]);
         }
 
-        return 10*(sum/((lastIndex-firstIndex+1)*4));
+        return 10 * (sum / ((lastIndex - firstIndex + 1) * 4));
     }
 
     private static double getValFor(String grade) {
@@ -70,7 +76,7 @@ public class Student {
     }
 
     public String getId() {
-        return ""+id;
+        return "" + id;
     }
 
     public void setId(int id) {
@@ -101,11 +107,11 @@ public class Student {
         this.displayName = displayName;
     }
 
-    public int getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(int gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
@@ -119,7 +125,7 @@ public class Student {
 
     @Override
     public boolean equals(Object obj) {
-        Student other = (Student)obj;
+        Student other = (Student) obj;
         return other.getId() == this.getId();
     }
 
@@ -134,13 +140,13 @@ public class Student {
         if (experienceCompare == 0 && !this.wantsSame) penalty += WORK_WITH_SAME_PENALTY;
         if (experienceCompare < 0 && !this.wantsMore) penalty += WORK_WITH_MORE_PENALTY;
         if (this.largeExperienceDifference(other)) penalty += LARGE_EXP_DIFF_PENALTY;
-        if (this.likesSolo != other.likesSolo) penalty += SOLO_DIFF_PENALTY/2.0; // because it will be double counted
-        if (this.likeCollab != other.likeCollab) penalty += COLLAB_DIFF_PENALTY/2.0;
+        if (this.likesSolo != other.likesSolo) penalty += SOLO_DIFF_PENALTY / 2.0; // because it will be double counted
+        if (this.likeCollab != other.likeCollab) penalty += COLLAB_DIFF_PENALTY / 2.0;
         return penalty;
     }
 
     public int timesSatWith(String id) {
-        return (partnerHistory.containsKey(id)?partnerHistory.get(id):0);
+        return (partnerHistory.containsKey(id) ? partnerHistory.get(id) : 0);
     }
 
     private boolean largeExperienceDifference(Student other) {
@@ -152,12 +158,12 @@ public class Student {
     }
 
     public void recordSittingWith(Student seat) {
-        String id = ""+seat.getId();
+        String id = "" + seat.getId();
         if (!partnerHistory.containsKey(id)) {
             partnerHistory.put(id, 1);
         } else {
             int num = partnerHistory.get(id);
-            partnerHistory.put(id, num+1);
+            partnerHistory.put(id, num + 1);
         }
     }
 
@@ -171,5 +177,15 @@ public class Student {
 
     public void setPartnerHistoryFor(String idStr, int num) {
         this.partnerHistory.put(idStr, num);
+    }
+
+    /***
+     * determine if sitting with Student other would be an affinity group violation
+     * @param other other student
+     * @return 0 for no violation, 1 for violation (to facilitate calculation when called)
+     */
+    public int isAffinityViolation(Student other) {
+        if (this.wantsGender.length() == 0) return 0;
+        return (wantsGender.contains(other.getGender()))?0:1;
     }
 }

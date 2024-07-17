@@ -10,6 +10,12 @@ import java.util.HashSet;
 
 /*
 TODO: adjust font smaller automatically (or clip names) ?
+TODO: bug: if some charts have 2 per group and some 3, display doesn't change as we arrow through them
+TODO: add way to delete a chart that appropriately updates the partner histories
+
+TODO: switch display to match a room layout
+TODO: make color-coding for attainment (or other marking) so I can print and me/TA's can see
+
  */
 
 public class Main extends PApplet {
@@ -95,7 +101,7 @@ public class Main extends PApplet {
     // TODO: if key 'u' for use, automatically update partner records
     // TODO: way to save/revisit history of charts.
 
-    private HashMap<String, HashSet<String>> loadOldPartnerRecords(String filePath) throws IOException {
+/*    private HashMap<String, HashSet<String>> loadOldPartnerRecords(String filePath) throws IOException {
         HashMap<String, HashSet<String>> partnerRecords = new HashMap<String, HashSet<String>>();
         String file = readFile(filePath);
         String[] lines = file.split("\n");
@@ -116,7 +122,7 @@ public class Main extends PApplet {
         }
 
         return partnerRecords;
-    }
+    }*/
 
     private ArrayList<Student> loadStudents(String filePath) throws IOException {
         ArrayList<Student> students = new ArrayList<>();
@@ -130,6 +136,7 @@ public class Main extends PApplet {
                 students.add(s);
             } catch (Exception e) {
                 System.err.println("Error making student from line: " + line);
+                System.err.println(e);
             }
         }
 

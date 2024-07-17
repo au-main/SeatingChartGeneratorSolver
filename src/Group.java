@@ -219,13 +219,30 @@ public class Group {
         return penalty;
     }*/
 
-    // TODO: penalities
-    // sitting with same partners
-
     public double getPenalty() {
         double penalty = 0;
 
         penalty += getRepeatedPartnerPentalty();
+        penalty += getAffinityGroupPenalty();
+        return penalty;
+    }
+
+    /***
+     * if a group member wants female partners but doesn't get them, that's an affinity penalty
+     * @return
+     */
+    private double getAffinityGroupPenalty() {
+        double penalty = 0;
+        for (int i = 0; i < this.seats.length; i++) {
+            if (seats[i] == null) continue;
+
+            for (int j = i+1; j < seats.length; j++) {
+                if (seats[j] == null) continue;
+
+                penalty += PENALTY_LEVEL[1] * seats[i].isAffinityViolation(seats[j]);
+                penalty += PENALTY_LEVEL[1] * seats[j].isAffinityViolation(seats[i]);
+            }
+        }
 
         return penalty;
     }
