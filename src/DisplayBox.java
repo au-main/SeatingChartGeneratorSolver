@@ -7,6 +7,7 @@ public class DisplayBox {
     private int x, y, w, h;
     private int rows, cols;     // how names are organized within the box
     private Group desk;
+    private float textSize = 24;
 
     public DisplayBox(int x, int y, int w, int h, int rows, int cols, Group desk) {
         this.x = x;
@@ -71,7 +72,7 @@ public class DisplayBox {
     }
 */
 
-    public void draw(PApplet window, boolean shadeConstraintViolations) {
+    public void draw(PApplet window, boolean shadeConstraintViolations, boolean autoSizeText) {
         window.fill(255);
         window.stroke(255);
 
@@ -80,14 +81,27 @@ public class DisplayBox {
             window.fill(255, 255 - val, 255 - val);
         }
 
-        if (DRAW_BORDER)
-            window.rect(x, y, w, h);
+/*        if (DRAW_BORDER)
+            window.rect(x, y, w, h);*/
+
         window.fill(0);
         window.textAlign(window.LEFT, window.TOP);
 
         int position = 0;
+        float colWidth = (float)(w / (double) cols);
+        float rowHeight = (float)((h / (double) rows));
+
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
+                int deskX = (int) (x + col * colWidth);
+                int deskY = (int) (y + row * rowHeight);
+
+                if (DRAW_BORDER) {
+                    window.fill(0,0,0,0);
+                    window.stroke(0);
+                    window.rect(deskX, deskY, colWidth, rowHeight);
+                }
+
                 if (desk.isFrozen(position)) {
                     window.fill(255, 0, 0);
                     window.stroke(255, 0, 0);
@@ -95,15 +109,43 @@ public class DisplayBox {
                     window.fill(0);
                     window.stroke(0);
                 }
+                String name = getName(position);
 
-                window.text(getName(position), (int) (x + col * (w / (double) cols)), (int) (y + row * (h / (double) rows)));
+                getFittingTextSize(window, name, colWidth, textSize);
+                window.text(name, deskX, deskY);
                 position++;
             }
         }
     }
 
     public void draw(PApplet window) {
-        draw(window, false);
+        draw(window, false, true);
+    }
+
+    // Use defaultMax size if text will fit.  Otherwise calculate new smaller size
+    private float getFittingTextSize(PApplet window, String text, float targetWidth, float defaultMax) {
+        window.textSize(defaultMax);
+        if (window.textWidth(text) <= targetWidth) return defaultMax;
+
+        float minSize = 8;    // Smallest possible text size
+        float maxSize = defaultMax;  // Start with a reasonably large text size
+
+        // Binary search for the correct text size
+        while (minSize < maxSize) {
+            float midSize = (minSize + maxSize) / 2;
+            window.textSize(midSize);
+            float textWidth = window.textWidth(text);
+
+            if (textWidth > targetWidth) {
+                maxSize = midSize - 0.5f;  // Reduce the max size
+            } else {
+                minSize = midSize + 0.5f;  // Increase the min size
+            }
+        }
+
+        // Use the smaller value of minSize to ensure it fits
+        window.textSize(minSize);
+        return minSize;
     }
 
     public String getName(int position) {

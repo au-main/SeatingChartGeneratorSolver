@@ -26,6 +26,9 @@ public class Main extends PApplet {
     private static final int LEFT_BUFF = 80;
     private static final int LIST_DISPLAY = 0;
     private static final int NUM_TO_SEARCH = 1000000;
+    private static final int LIST_LAYOUT = 0;
+    private static final int ROOM_LAYOUT = 1;
+    private static final int DISPLAY_MODE = LIST_LAYOUT;
 
     private int studentsPerGroup = 3;
     private int currentSelectionIndex = -1;
@@ -46,7 +49,7 @@ public class Main extends PApplet {
     private int maxChartIndex = -1;
 
     public void settings() {
-        size(1000, 800);
+        size(1200, 1000);
     }
 
     public void setup() {
@@ -59,7 +62,8 @@ public class Main extends PApplet {
 
         try {
             ArrayList<Student> studentData = loadStudents(BASE_PATH + file);
-            System.out.println(studentData);
+            Student.fixDisplayNames(studentData);
+
             chart.addStudents(studentData);
             String partnerHistoryFileName = file.substring(0, file.indexOf(".")) + "-partnerHistories.csv";
             chart.loadPartnerHistoryFromFile(BASE_PATH + partnerHistoryFileName);
@@ -79,6 +83,16 @@ public class Main extends PApplet {
     }
 
     private ArrayList<DisplayBox> makeDisplayListFor(SeatingChart chart) {
+        if (DISPLAY_MODE == LIST_LAYOUT) {
+            return makeListDisplayFor(chart);
+        } else if (DISPLAY_MODE == ROOM_LAYOUT) {
+            return makeRm72DisplayChartRowsFor(chart);
+        }
+        System.err.println("Set DISPLAY_MODE to LIST or ROOM_LAYOUT");
+        return null;
+    }
+
+    private ArrayList<DisplayBox> makeListDisplayFor(SeatingChart chart) {
         ArrayList<DisplayBox> out = new ArrayList<>();
         int row = 0;
         int col = 0;
@@ -98,10 +112,35 @@ public class Main extends PApplet {
         return out;
     }
 
-    // TODO: make one for saving partner records
-    // TODO: on load, if no partner records make an empty one
-    // TODO: if key 'u' for use, automatically update partner records
-    // TODO: way to save/revisit history of charts.
+    private ArrayList<DisplayBox> makeRm72DisplayChartRowsFor(SeatingChart chart) {
+        ArrayList<DisplayBox> out = new ArrayList<>();
+
+        int BOX_WIDTH = 350;
+        int BOX_HEIGHT = 100;
+        int row = 0;
+        int col = 0;
+        int x = 50;
+        int y = 50;
+        int X_SKIP = 400;
+        int Y_SKIP = 200;
+
+        for (Group desk : chart.getGroups()) {
+            DisplayBox box = new DisplayBox(x, y, BOX_WIDTH, BOX_HEIGHT, 1, desk.size(), desk);
+
+            out.add(box);
+
+           y += Y_SKIP;
+           row++;
+           if (row >= 4) {
+                row = 0;
+                y = 50;
+                col++;
+                x += X_SKIP;
+            }
+        }
+
+        return out;
+    }
 
 /*    private HashMap<String, HashSet<String>> loadOldPartnerRecords(String filePath) throws IOException {
         HashMap<String, HashSet<String>> partnerRecords = new HashMap<String, HashSet<String>>();
@@ -149,7 +188,7 @@ public class Main extends PApplet {
         background(255);
 
         for (DisplayBox box : displayList) {
-            box.draw(this, displayConflicts);
+            box.draw(this, displayConflicts, true);
 
             if (box.isMouseOver(mouseX, mouseY)) {
                 box.highlight(this, color(0, 255, 0));
@@ -160,8 +199,8 @@ public class Main extends PApplet {
             displayList.get(currentSelectionIndex).highlight(this, color(0, 255, 255));
         }
 
-        drawRowNumbers();
-        drawColHeaders();
+       // drawRowNumbers();
+       // drawColHeaders();
 
         if (currentScore >= 0) {
             fill(0);

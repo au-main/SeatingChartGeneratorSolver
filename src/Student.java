@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Student {
@@ -51,7 +52,7 @@ public class Student {
         if (vals.length > 16) {
             wantsGender = vals[16];
         }
-        Student s = new Student(id, fn, ln, fn + " " + ln.substring(0, 1) + ".", exp, same, more, less, solo, collab, gender, wantsGender);
+        Student s = new Student(id, fn, ln, fn, exp, same, more, less, solo, collab, gender, wantsGender);
         return s;
     }
 
@@ -76,6 +77,23 @@ public class Student {
             return score;
         } catch (Exception e) {
             return 0;
+        }
+    }
+
+    /***
+     * if there are multiple students with the same first name, modify their display names to include last initial
+     * @param studentData
+     */
+    public static void fixDisplayNames(ArrayList<Student> studentData) {
+        for (int i = 0; i < studentData.size(); i++) {
+            for (int j = i+1; j < studentData.size(); j++) {
+                Student s1 = studentData.get(i);
+                Student s2 = studentData.get(j);
+                if (s1.getDisplayName().equals(s2.getDisplayName())) {
+                    s1.setDisplayName(s1.getFn() + " " + s1.getLn().substring(0,1));
+                    s2.setDisplayName(s2.getFn() + " " + s2.getLn().substring(0,1));
+                }
+            }
         }
     }
 
