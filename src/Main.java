@@ -75,7 +75,7 @@ public class Main extends PApplet {
         }
 
         numColumns = (int) (chart.getStudents().size() / numNamesPerCol) + 1;
-        columnWidth = (width - LEFT_BUFF) / numColumns;
+        columnWidth = (width - 2*LEFT_BUFF) / numColumns;
 
         chart.assignRandomly();
         displayList = makeDisplayListFor(chart);
@@ -194,8 +194,10 @@ public class Main extends PApplet {
             displayList.get(currentSelectionIndex).highlight(this, color(0, 255, 255));
         }
 
-        // drawRowNumbers();
-        // drawColHeaders();
+        if (displayMode == LIST_LAYOUT) {
+            drawRowNumbers();
+            drawColHeaders();
+        }
 
         if (currentScore >= 0) {
             fill(0);
