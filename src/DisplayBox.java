@@ -73,17 +73,6 @@ public class DisplayBox {
 */
 
     public void draw(PApplet window, boolean shadeConstraintViolations, boolean autoSizeText) {
-        window.fill(255);
-        window.stroke(255);
-
-        if (shadeConstraintViolations) {
-            float val = 255 * window.map((float) desk.getPenalty(), 0, MAX_PENALTY, 0, 1);
-            window.fill(255, 255 - val, 255 - val);
-        }
-
-/*        if (DRAW_BORDER)
-            window.rect(x, y, w, h);*/
-
         window.fill(0);
         window.textAlign(window.LEFT, window.TOP);
 
@@ -97,8 +86,13 @@ public class DisplayBox {
                 int deskY = (int) (y + row * rowHeight);
 
                 if (DRAW_BORDER) {
-                    window.fill(0,0,0,0);
                     window.stroke(0);
+                    if (shadeConstraintViolations) {
+                        float val = 255 * window.map((float) desk.getPenalty(), 0, MAX_PENALTY, 0, 1);
+                        window.fill(255, 255 - val, 255 - val);
+                    } else {
+                        window.fill(0, 0, 0, 0);
+                    }
                     window.rect(deskX, deskY, colWidth, rowHeight);
                 }
 
@@ -113,9 +107,12 @@ public class DisplayBox {
 
                 getFittingTextSize(window, name, colWidth, textSize);
                 window.text(name, deskX, deskY);
+
                 position++;
             }
         }
+
+
     }
 
     public void draw(PApplet window) {

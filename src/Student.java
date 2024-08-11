@@ -41,18 +41,18 @@ public class Student {
         String fn = vals[1].trim();
         String ln = vals[2].trim();
 
-        double exp = averageGrades(vals, 3, 8);
+/*        double exp = averageGrades(vals, 3, 8);
         boolean same = Boolean.parseBoolean(vals[9]);
         boolean more = Boolean.parseBoolean(vals[10]);
         boolean less = Boolean.parseBoolean(vals[11]);
         boolean solo = Boolean.parseBoolean(vals[12]);
-        boolean collab = Boolean.parseBoolean(vals[13]);
-        String gender = vals[15];
+        boolean collab = Boolean.parseBoolean(vals[13]);*/
+        String gender = vals[3];
         String wantsGender = "";
-        if (vals.length > 16) {
-            wantsGender = vals[16];
+        if (vals.length > 9) {      // REMEMBER: if it's the 10th col, vals.length > 9, then access vals[9]
+            wantsGender = vals[9];
         }
-        Student s = new Student(id, fn, ln, fn, exp, same, more, less, solo, collab, gender, wantsGender);
+        Student s = new Student(id, fn, ln, fn, 10, false, true, true, true, true, gender, wantsGender);
         return s;
     }
 

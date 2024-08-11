@@ -21,14 +21,16 @@ TODO: make color-coding for attainment (or other marking) so I can print and me/
  */
 
 public class Main extends PApplet {
+    private String BASE_PATH = "DataFiles/";
+    private String file = "block2-2024.csv";
+
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
     private static final int LEFT_BUFF = 80;
-    private static final int LIST_DISPLAY = 0;
+
     private static final int NUM_TO_SEARCH = 1000000;
     private static final int LIST_LAYOUT = 0;
     private static final int ROOM_LAYOUT = 1;
-    private static final int DISPLAY_MODE = LIST_LAYOUT;
 
     private int studentsPerGroup = 3;
     private int currentSelectionIndex = -1;
@@ -40,9 +42,7 @@ public class Main extends PApplet {
     int numNamesPerCol, numColumns;
     int columnWidth;
 
-    int displayMode = LIST_DISPLAY;
-    private String BASE_PATH = "DataFiles/";
-    private String file = "block2.csv";
+    int displayMode = ROOM_LAYOUT;
     private boolean displayConflicts = false;
     private double currentScore = -1;
     private int currentChartIndex = -1;
@@ -83,9 +83,9 @@ public class Main extends PApplet {
     }
 
     private ArrayList<DisplayBox> makeDisplayListFor(SeatingChart chart) {
-        if (DISPLAY_MODE == LIST_LAYOUT) {
+        if (displayMode == LIST_LAYOUT) {
             return makeListDisplayFor(chart);
-        } else if (DISPLAY_MODE == ROOM_LAYOUT) {
+        } else if (displayMode == ROOM_LAYOUT) {
             return makeRm72DisplayChartRowsFor(chart);
         }
         System.err.println("Set DISPLAY_MODE to LIST or ROOM_LAYOUT");
@@ -114,28 +114,23 @@ public class Main extends PApplet {
 
     private ArrayList<DisplayBox> makeRm72DisplayChartRowsFor(SeatingChart chart) {
         ArrayList<DisplayBox> out = new ArrayList<>();
-
         int BOX_WIDTH = 350;
         int BOX_HEIGHT = 100;
-        int row = 0;
-        int col = 0;
-        int x = 50;
-        int y = 50;
         int X_SKIP = 400;
         int Y_SKIP = 200;
+        int X_START = 25;
+        int Y_START = 50;
 
-        for (Group desk : chart.getGroups()) {
-            DisplayBox box = new DisplayBox(x, y, BOX_WIDTH, BOX_HEIGHT, 1, desk.size(), desk);
+        int nextGroup = 0;
 
-            out.add(box);
+        for (int col = 2; col >= 0; col--) {
+            for (int row = 3; row >= 0; row--) {
+                if (nextGroup >= chart.getGroups().size()) return out;
+                Group group = chart.getGroups().get(nextGroup);
+                nextGroup++;
 
-           y += Y_SKIP;
-           row++;
-           if (row >= 4) {
-                row = 0;
-                y = 50;
-                col++;
-                x += X_SKIP;
+                DisplayBox box = new DisplayBox(X_START + col * (BOX_WIDTH+30), Y_START + row * (BOX_HEIGHT+80), BOX_WIDTH, BOX_HEIGHT, 1, group.size(), group);
+                out.add(box);
             }
         }
 
@@ -199,8 +194,8 @@ public class Main extends PApplet {
             displayList.get(currentSelectionIndex).highlight(this, color(0, 255, 255));
         }
 
-       // drawRowNumbers();
-       // drawColHeaders();
+        // drawRowNumbers();
+        // drawColHeaders();
 
         if (currentScore >= 0) {
             fill(0);
@@ -211,8 +206,10 @@ public class Main extends PApplet {
         if (currentChartIndex >= 0) {
             fill(0);
             stroke(0);
-            text("Chart " + currentChartIndex + " of " + (maxChartIndex-1), width/2, height - 40);
+            text("Chart " + currentChartIndex + " of " + (maxChartIndex - 1), width / 2, height - 40);
         }
+
+        text(file.substring(0, file.indexOf(".")), width - 100, height - 40);
     }
 
     private void drawColHeaders() {
@@ -235,7 +232,7 @@ public class Main extends PApplet {
         if (keyCode == UP) {
             currentChartIndex++;
             if (currentChartIndex >= maxChartIndex) {
-                currentChartIndex = maxChartIndex-1;
+                currentChartIndex = maxChartIndex - 1;
             }
 
             String basename = file.substring(0, file.indexOf("."));     // TODO: clean up many times we do this
@@ -243,7 +240,7 @@ public class Main extends PApplet {
             chart.loadSeatingChartFromFile(BASE_PATH + nextChartName);
             displayList = makeDisplayListFor(chart);
             currentScore = chart.getScore();                            // TODO: clean up having to remember to makeDisplayLIst For
-                                                                        // make more helper methods to make this cleaner
+            // make more helper methods to make this cleaner
         }
 
         if (keyCode == DOWN) {
@@ -267,8 +264,13 @@ public class Main extends PApplet {
             }
         }
 
-        if (key == 'd' || key == 'D') {
+        if (key == 'c' || key == 'C') {
             displayConflicts = !displayConflicts;
+        }
+
+        if (key == 'm' || key == 'M') {
+            displayMode = (displayMode == LIST_LAYOUT) ? ROOM_LAYOUT : LIST_LAYOUT;
+            displayList = makeDisplayListFor(chart);
         }
 
         if (key == 'r' || key == 'R') {
