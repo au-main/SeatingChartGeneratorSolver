@@ -1,5 +1,7 @@
 import processing.core.PApplet;
 
+import java.util.ArrayList;
+
 public class DisplayBox {
     private static final boolean DRAW_BORDER = true;
     private static final float HORIZ_BUFFER = 20;
@@ -32,6 +34,22 @@ public class DisplayBox {
         b2.y = y;
         b2.w = w;
         b2.h = h;
+    }
+
+    public static void swapStudents(int[] draggingSeat, int[] targetSeat, ArrayList<DisplayBox> displayList) {
+        DisplayBox source = displayList.get(draggingSeat[0]);
+        DisplayBox target = displayList.get(targetSeat[0]);
+
+        swapStudents(source, draggingSeat[1], draggingSeat[2], target, targetSeat[1], targetSeat[2]);
+    }
+
+    public static void swapStudents(DisplayBox source, int sr, int sc, DisplayBox target, int tr, int tc) {
+        int sourcePosition = sr * source.cols + sc;
+        int targetPosition = tr * target.cols + tc;
+        Student sourceStudent = source.desk.get(sourcePosition);
+        Student targetStudent = target.desk.get(targetPosition);
+        source.desk.set(sourcePosition, targetStudent);
+        target.desk.set(targetPosition, sourceStudent);
     }
 
     public int getX() {
@@ -161,6 +179,8 @@ public class DisplayBox {
 
         return new int[]{r, c};
     }
+
+
 
     public void mouseOverHighlight(int mouseX, int mouseY, PApplet window) {
         int[] indicies = getNameBoxIndicies(mouseX, mouseY);

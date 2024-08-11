@@ -48,6 +48,8 @@ public class Main extends PApplet {
     private int currentChartIndex = -1;
     private int maxChartIndex = -1;
 
+    private int[] draggingSeat = null;    // { group index, row-within-group, col-within-group }
+
     public void settings() {
         size(1200, 1000);
     }
@@ -75,7 +77,7 @@ public class Main extends PApplet {
         }
 
         numColumns = (int) (chart.getStudents().size() / numNamesPerCol) + 1;
-        columnWidth = (width - 2*LEFT_BUFF) / numColumns;
+        columnWidth = (width - 2 * LEFT_BUFF) / numColumns;
 
         chart.assignRandomly();
         displayList = makeDisplayListFor(chart);
@@ -129,36 +131,13 @@ public class Main extends PApplet {
                 Group group = chart.getGroups().get(nextGroup);
                 nextGroup++;
 
-                DisplayBox box = new DisplayBox(X_START + col * (BOX_WIDTH+30), Y_START + row * (BOX_HEIGHT+80), BOX_WIDTH, BOX_HEIGHT, 1, group.size(), group);
+                DisplayBox box = new DisplayBox(X_START + col * (BOX_WIDTH + 30), Y_START + row * (BOX_HEIGHT + 80), BOX_WIDTH, BOX_HEIGHT, 1, group.size(), group);
                 out.add(box);
             }
         }
 
         return out;
     }
-
-/*    private HashMap<String, HashSet<String>> loadOldPartnerRecords(String filePath) throws IOException {
-        HashMap<String, HashSet<String>> partnerRecords = new HashMap<String, HashSet<String>>();
-        String file = readFile(filePath);
-        String[] lines = file.split("\n");
-
-        for (String line : lines) {
-            line = line.trim();
-            try {
-                String[] vals = line.split(",");
-                String id = vals[1];  // vals[0] is for name, not used
-                HashSet<String> partners = new HashSet<>();
-                for (int i = 2; i < vals.length; i++) {
-                    partners.add(vals[i]);
-                }
-                partnerRecords.put(id, partners);
-            } catch (Exception e) {
-                System.err.println("Error making student from line: " + line);
-            }
-        }
-
-        return partnerRecords;
-    }*/
 
     private ArrayList<Student> loadStudents(String filePath) throws IOException {
         ArrayList<Student> students = new ArrayList<>();
@@ -185,9 +164,9 @@ public class Main extends PApplet {
         for (DisplayBox box : displayList) {
             box.draw(this, displayConflicts, true);
 
-            if (box.isMouseOver(mouseX, mouseY)) {
+/*            if (box.isMouseOver(mouseX, mouseY)) {
                 box.highlight(this, color(0, 255, 0));
-            }
+            }*/
         }
 
         if (currentSelectionIndex >= 0) {
@@ -297,6 +276,24 @@ public class Main extends PApplet {
         }
     }
 
+    public void mousePressed() {
+        draggingSeat = getSeatAt(mouseX, mouseY, displayList);
+    }
+
+    private int[] getSeatAt(int mouseX, int mouseY, ArrayList<DisplayBox> displayList) {
+        for (int i = 0; i < displayList.size(); i++) {
+            DisplayBox desk = displayList.get(i);
+
+            if (desk.isMouseOver(mouseX, mouseY)) {
+                int[] indicies = desk.getNameBoxIndicies(mouseX, mouseY);
+                return new int[] {i, indicies[0], indicies[1]};
+            }
+        }
+
+        return null;
+    }
+
+
     private SeatingChart randomSearchForBestChart(int numToSearch) {
         double minScore = Double.MAX_VALUE;
         SeatingChart bestChart = null;
@@ -322,15 +319,14 @@ public class Main extends PApplet {
         }
 
         if (mouseButton == LEFT) {
-            if (currentSelectionIndex >= 0) {
-                int clickedIndex = getClickedBox(mouseX, mouseY);
-                DisplayBox clickedBox = displayList.get(clickedIndex);
-                if (clickedBox == null) return;
-                DisplayBox selectedBox = displayList.get(currentSelectionIndex);
-                DisplayBox.swapLocations(clickedBox, selectedBox);
-                currentSelectionIndex = -1;
-            } else {
-                currentSelectionIndex = getClickedBox(mouseX, mouseY);
+            if (draggingSeat != null) {
+                int[] targetSeat = getSeatAt(mouseX, mouseY, displayList);
+
+                if (targetSeat != null) {
+                    DisplayBox.swapStudents(draggingSeat, targetSeat, displayList);
+                }
+
+                draggingSeat = null;
             }
         }
     }
