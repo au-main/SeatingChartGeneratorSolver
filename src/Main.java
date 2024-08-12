@@ -9,14 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /*
-TODO: add ability to turn on/off different penalities in the calculation
-TODO: add skill level mismatch penalities
-
-TODO: adjust font smaller automatically (or clip names) ?
 TODO: bug: if some charts have 2 per group and some 3, display doesn't change as we arrow through them
 TODO: add way to delete a chart that appropriately updates the partner histories
-
-TODO: switch display to match a room layout
 TODO: make color-coding for attainment (or other marking) so I can print and me/TA's can see
  */
 
@@ -174,6 +168,7 @@ public class Main extends PApplet {
                 box.highlight(this, color(0, 255, 0));
             }*/
         }
+        textSize(TEXT_SIZE);
 
         if (currentSelectionIndex >= 0) {
             displayList.get(currentSelectionIndex).highlight(this, color(0, 255, 255));
@@ -187,15 +182,18 @@ public class Main extends PApplet {
         if (currentScore >= 0) {
             fill(0);
             stroke(0);
+            textAlign(LEFT);
             text("Score: " + currentScore, 10, height - 40);
         }
 
         if (currentChartIndex >= 0) {
             fill(0);
             stroke(0);
+            textAlign(RIGHT);
             text("Chart " + currentChartIndex + " of " + (maxChartIndex - 1), width / 2, height - 40);
         }
 
+        textAlign(RIGHT);
         text(file.substring(0, file.indexOf(".")), width - 100, height - 40);
     }
 
