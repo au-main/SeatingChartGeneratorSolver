@@ -259,4 +259,10 @@ public class DisplayBox {
             }
         }
     }
+
+    public void drawGroupNumber(int i, PApplet window) {
+        window.textSize(50);
+        window.textAlign(window.CENTER, window.CENTER);
+        window.text(""+i, x + w/2.0f, y - h/3.0f);
+    }
 }

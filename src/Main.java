@@ -49,6 +49,7 @@ public class Main extends PApplet {
     private int maxChartIndex = -1;
 
     private int[] draggingSeat = null;    // { group index, row-within-group, col-within-group }
+    private boolean displayGroupNums = true;
 
     public void settings() {
         size(1200, 1000);
@@ -161,8 +162,13 @@ public class Main extends PApplet {
     public void draw() {
         background(255);
 
+        int i = 1;
         for (DisplayBox box : displayList) {
             box.draw(this, displayConflicts, true);
+            if (displayMode == ROOM_LAYOUT && displayGroupNums) {
+                box.drawGroupNumber(i, this);
+            }
+            i++;
 
 /*            if (box.isMouseOver(mouseX, mouseY)) {
                 box.highlight(this, color(0, 255, 0));
@@ -258,6 +264,10 @@ public class Main extends PApplet {
             reshuffle();
             currentScore = chart.getScore();
             currentChartIndex = -1;
+        }
+
+        if (key == 't' || key == 'T') {
+            displayGroupNums = !displayGroupNums;
         }
 
         if (key == 'o' || key == 'O') {
