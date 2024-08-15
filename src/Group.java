@@ -210,9 +210,9 @@ public class Group {
     public double getPenalty() {
         double penalty = 0;
 
-        //penalty += getRepeatedPartnerPentalty();
+        penalty += getRepeatedPartnerPentalty();
         //penalty += getAffinityGroupPenalty();
-        penalty += getSkillMismatchPenalty();
+        //penalty += getSkillMismatchPenalty();
 
         return penalty;
     }

@@ -90,7 +90,7 @@ public class DisplayBox {
     }
 */
 
-    public void draw(PApplet window, boolean shadeConstraintViolations, boolean autoSizeText) {
+    public void draw(PApplet window, boolean shadeConstraintViolations, boolean autoSizeText, boolean horizontallyReflect) {
         window.fill(0);
         window.textAlign(window.LEFT, window.TOP);
 
@@ -103,6 +103,10 @@ public class DisplayBox {
                 int deskX = (int) (x + col * colWidth);
                 int deskY = (int) (y + row * rowHeight);
 
+                if (horizontallyReflect) {
+                    deskX = (int)(window.width - deskX);
+                }
+
                 if (DRAW_BORDER) {
                     window.stroke(0);
                     if (shadeConstraintViolations) {
@@ -111,7 +115,11 @@ public class DisplayBox {
                     } else {
                         window.fill(0, 0, 0, 0);
                     }
-                    window.rect(deskX, deskY, colWidth, rowHeight);
+                    if (horizontallyReflect) {
+                        window.rect(deskX - colWidth, deskY, colWidth, rowHeight);
+                    } else {
+                        window.rect(deskX, deskY, colWidth, rowHeight);
+                    }
                 }
 
                 if (desk.isFrozen(position)) {
@@ -124,8 +132,11 @@ public class DisplayBox {
                 String name = getName(position);
 
                 getFittingTextSize(window, name, colWidth, textSize);
-                window.text(name, deskX, deskY);
-
+                if (horizontallyReflect) {
+                    window.text(name, deskX - colWidth, deskY);
+                } else {
+                    window.text(name, deskX, deskY);
+                }
                 position++;
             }
         }
@@ -134,7 +145,7 @@ public class DisplayBox {
     }
 
     public void draw(PApplet window) {
-        draw(window, false, true);
+        draw(window, false, true, false);
     }
 
     // Use defaultMax size if text will fit.  Otherwise calculate new smaller size
@@ -260,9 +271,13 @@ public class DisplayBox {
         }
     }
 
-    public void drawGroupNumber(int i, PApplet window) {
+    public void drawGroupNumber(int i, PApplet window, boolean horizontallyReflect) {
         window.textSize(50);
         window.textAlign(window.CENTER, window.CENTER);
-        window.text(""+i, x + w/2.0f, y - h/3.0f);
+        if (horizontallyReflect) {
+            window.text("" + i, window.width - (x + w / 2.0f), y - h / 3.0f);
+        } else {
+            window.text("" + i, x + w / 2.0f, y - h / 3.0f);
+        }
     }
 }

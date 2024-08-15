@@ -16,7 +16,7 @@ TODO: make color-coding for attainment (or other marking) so I can print and me/
 
 public class Main extends PApplet {
     private String BASE_PATH = "DataFiles/";
-    private String file = "block2-2024.csv";
+    private String file = "example.csv";
 
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
@@ -44,6 +44,7 @@ public class Main extends PApplet {
 
     private int[] draggingSeat = null;    // { group index, row-within-group, col-within-group }
     private boolean displayGroupNums = true;
+    private boolean horizontallyReflect = false;
 
     public void settings() {
         size(1200, 1000);
@@ -158,9 +159,9 @@ public class Main extends PApplet {
 
         int i = 1;
         for (DisplayBox box : displayList) {
-            box.draw(this, displayConflicts, true);
+            box.draw(this, displayConflicts, true, horizontallyReflect);
             if (displayMode == ROOM_LAYOUT && displayGroupNums) {
-                box.drawGroupNumber(i, this);
+                box.drawGroupNumber(i, this, horizontallyReflect);
             }
             i++;
 
@@ -195,6 +196,11 @@ public class Main extends PApplet {
 
         textAlign(RIGHT);
         text(file.substring(0, file.indexOf(".")), width - 100, height - 40);
+        if (horizontallyReflect) {
+            textAlign(LEFT);
+            textSize(10);
+            text("printed", width - 200, height - 20);
+        }
     }
 
     private void drawColHeaders() {
@@ -249,8 +255,13 @@ public class Main extends PApplet {
             }
         }
 
+        if (key == 'p' || key == 'P') {
+            horizontallyReflect = !horizontallyReflect;
+        }
+
         if (key == 'c' || key == 'C') {
             displayConflicts = !displayConflicts;
+            System.out.println("Display conflicts: " + displayConflicts);
         }
 
         if (key == 'm' || key == 'M') {
@@ -281,6 +292,7 @@ public class Main extends PApplet {
             chart.save(BASE_PATH, baseFileName);
             currentChartIndex = maxChartIndex;
             maxChartIndex++;
+            currentSelectionIndex++;
         }
     }
 
@@ -303,18 +315,24 @@ public class Main extends PApplet {
 
 
     private SeatingChart randomSearchForBestChart(int numToSearch) {
+        System.out.println("Finding a good chart.  Searching " + numToSearch + " possibilities.");
         double minScore = Double.MAX_VALUE;
         SeatingChart bestChart = null;
 
         for (int i = 0; i < numToSearch; i++) {
+            if (i % 10000 == 0) {
+                System.out.println("Searched " + i + " / " + numToSearch + " charts.");
+            }
             chart.assignRandomly();
             double score = chart.getScore();
             if (score < minScore) {
                 minScore = score;
                 bestChart = new SeatingChart(chart);
+                if (minScore == 0) return bestChart;
             }
         }
 
+        System.out.println("Done.  Best chart has score: " + bestChart.getScore());
         return bestChart;
     }
 
