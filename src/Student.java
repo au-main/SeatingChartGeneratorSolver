@@ -148,7 +148,7 @@ public class Student {
     @Override
     public boolean equals(Object obj) {
         Student other = (Student) obj;
-        return other.getId() == this.getId();
+        return other.getId().equals(this.getId());
     }
 
     public String toString() {

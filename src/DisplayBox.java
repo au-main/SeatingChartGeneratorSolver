@@ -179,7 +179,7 @@ public class DisplayBox {
     }
 
     public boolean isMouseOver(int mousex, int mousey) {
-        return (x < mousex && mousex < x + w) && (y < mousey && mousey < y + h);
+        return (x <= mousex && mousex <= x + w) && (y <= mousey && mousey <= y + h);
     }
 
     public int[] getNameBoxIndicies(int mouseX, int mouseY) {
