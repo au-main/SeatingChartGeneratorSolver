@@ -16,7 +16,7 @@ TODO: make color-coding for attainment (or other marking) so I can print and me/
 
 public class Main extends PApplet {
     private String BASE_PATH = "DataFiles/";
-    private String file = "example.csv";
+    private String file = "block3-2024.csv";
 
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
@@ -191,7 +191,7 @@ public class Main extends PApplet {
             fill(0);
             stroke(0);
             textAlign(RIGHT);
-            text("Chart " + currentChartIndex + " of " + (maxChartIndex - 1), width / 2, height - 40);
+            text("Chart " + (currentChartIndex+1) + " of " + (maxChartIndex + 1), width / 2, height - 40);
         }
 
         textAlign(RIGHT);
@@ -221,9 +221,10 @@ public class Main extends PApplet {
 
     public void keyReleased() {
         if (keyCode == UP) {
+            if (maxChartIndex < 0) return;
             currentChartIndex++;
-            if (currentChartIndex >= maxChartIndex) {
-                currentChartIndex = maxChartIndex - 1;
+            if (currentChartIndex > maxChartIndex) {
+                currentChartIndex = maxChartIndex;
             }
 
             String basename = file.substring(0, file.indexOf("."));     // TODO: clean up many times we do this
@@ -235,6 +236,7 @@ public class Main extends PApplet {
         }
 
         if (keyCode == DOWN) {
+            if (maxChartIndex < 0) return;
             currentChartIndex--;
             if (currentChartIndex < 0) {
                 currentChartIndex = 0;
@@ -292,6 +294,7 @@ public class Main extends PApplet {
             chart.save(BASE_PATH, baseFileName);
             currentChartIndex = maxChartIndex;
             maxChartIndex++;
+            System.out.println("Max chart index now: "+ maxChartIndex);
             currentSelectionIndex++;
         }
     }
