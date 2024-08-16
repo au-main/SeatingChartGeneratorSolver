@@ -16,7 +16,7 @@ TODO: make color-coding for attainment (or other marking) so I can print and me/
 
 public class Main extends PApplet {
     private String BASE_PATH = "DataFiles/";
-    private String file = "block3-2024.csv";
+    private String file = "block6-2024.csv";
 
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
@@ -67,7 +67,7 @@ public class Main extends PApplet {
             chart.loadPartnerHistoryFromFile(BASE_PATH + partnerHistoryFileName);
             String baseFileName = file.substring(0, file.indexOf("."));
             String nextNum = SeatingChart.getNumForNextSequentialFilename(BASE_PATH, baseFileName);
-            this.maxChartIndex = Integer.parseInt(nextNum);
+            this.maxChartIndex = Integer.parseInt(nextNum) - 1;
         } catch (IOException e) {
             System.err.println("Couldn't read the file: " + file);
         }
