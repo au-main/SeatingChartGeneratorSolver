@@ -1,7 +1,6 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,10 +9,19 @@ public class SeatingChart {
     private ArrayList<Student> students;
     private int studentsPerGroup;
 
+    private Comparator<Group> groupComparator = new Comparator<Group>() {
+        @Override
+        public int compare(Group o1, Group o2) {
+            return Double.compare(o1.getPenalty(), o2.getPenalty());
+        }
+    };
+    private PriorityQueue<Group> highestConflictGroups = new PriorityQueue<>(groupComparator);
+    private boolean penaltyDirty = true;
+
     public SeatingChart(SeatingChart toCopy) {
         this.groups = new ArrayList<>();
         for (Group g : toCopy.groups) {
-            this.groups.add( new Group( g ) );
+            this.groups.add(new Group(g));
         }
         this.students = toCopy.students;
         this.studentsPerGroup = toCopy.studentsPerGroup;
@@ -57,6 +65,7 @@ public class SeatingChart {
             groups.add(new Group(this, list));
         }
 
+        this.penaltyDirty = true;
     }
 
     public void deleteStudent(Student s) {
@@ -74,6 +83,8 @@ public class SeatingChart {
         }
 
         if (toRemove != null) this.groups.remove(toRemove);
+
+        this.penaltyDirty = true;
     }
 
     private Group findDeskWithSpace() {
@@ -84,17 +95,40 @@ public class SeatingChart {
     }
 
     public void assignRandomly() {
-        ArrayList<Student> cleard = clearGroupAssignments();
+        ArrayList<Student> cleared = clearGroupAssignments();
+        assignStudentsRandomly(cleared);
+    }
 
-        Collections.shuffle(cleard);
-        int nextStudent = 0;
+    /***
+     * Randomly assign List of students to groups with space.  Returns any unassigned students.
+     * @param toAssign list of students to assign random places
+     * @return list of unassigned students due to lack of space
+     */
+    public ArrayList<Student> assignStudentsRandomly(ArrayList<Student> toAssign) {
+        Collections.shuffle(toAssign);
+
+        int nextStudent = toAssign.size() - 1;
         for (Group group : groups) {
             while (group.hasSpace()) {
-                group.add(cleard.get(nextStudent));
-                nextStudent++;
-                if (nextStudent >= cleard.size()) return;
+                group.add(toAssign.remove(nextStudent));
+                nextStudent--;
+                this.penaltyDirty = true;
+                if (nextStudent < 0) return toAssign;
             }
         }
+
+        return toAssign;
+    }
+
+    public void reAssignWorstOffenders(int numHighestToSwap) {
+        ArrayList<Group> worstOffenders = getHighestPenaltyGroups(numHighestToSwap);
+        ArrayList<Student> cleared = new ArrayList<>();
+
+        for (Group group : worstOffenders) {
+            cleared.addAll(clearGroupAssignments(group));
+        }
+
+        assignStudentsRandomly(cleared);
     }
 
     private ArrayList<Student> clearGroupAssignments() {
@@ -103,6 +137,18 @@ public class SeatingChart {
             ArrayList<Student> removed = desk.clearExceptFrozen();
             if (removed.size() > 0) cleared.addAll(removed);
         }
+
+        this.penaltyDirty = true;
+        return cleared;
+    }
+
+    private ArrayList<Student> clearGroupAssignments(Group group) {
+        ArrayList<Student> cleared = new ArrayList<>();
+
+        ArrayList<Student> removed = group.clearExceptFrozen();
+        if (removed.size() > 0) cleared.addAll(removed);
+
+        this.penaltyDirty = true;
         return cleared;
     }
 
@@ -132,6 +178,8 @@ public class SeatingChart {
                 groups.remove(group);
             }
         }
+
+        this.penaltyDirty = true;
     }
 
     private void assignStudent(Student s, ArrayList<Group> desksWithEmpty) {
@@ -139,6 +187,7 @@ public class SeatingChart {
             if (group.hasSpace()) {
                 group.add(s);
                 if (!group.hasSpace()) desksWithEmpty.remove(group);
+                this.penaltyDirty = true;
                 return;
             }
         }
@@ -155,12 +204,38 @@ public class SeatingChart {
      * Return the penalty for this seating chart.
      * @return
      */
-    public double getScore() {
+    public double getPenalty() {
         double penalty = 0;
-        for (Group desk : groups) {
-            penalty += desk.getPenalty();
+
+        if (penaltyDirty) {
+            highestConflictGroups.clear();
+
+            for (Group desk : groups) {
+                double groupPenalty = desk.getPenalty();
+                highestConflictGroups.add(desk);
+                penalty += groupPenalty;
+            }
+
+            this.penaltyDirty = false;
         }
+
         return penalty;
+    }
+
+    public ArrayList<Group> getHighestPenaltyGroups(int num) {
+        if (penaltyDirty) {
+            getPenalty();           // if we need to re-build the priorityQueue of worst offenders
+        }
+
+        ArrayList<Group> groups = new ArrayList<>();
+
+        while (!highestConflictGroups.isEmpty() && groups.size() < num) {
+            groups.add(highestConflictGroups.poll());
+        }
+
+        this.penaltyDirty = true;       // because polling destroys the data
+        // TODO: modify this to do it without destroying?
+        return groups;
     }
 
     public void save(String pathToFile, String baseName) {

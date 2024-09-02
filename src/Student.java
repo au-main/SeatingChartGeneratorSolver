@@ -48,11 +48,12 @@ public class Student {
         boolean solo = Boolean.parseBoolean(vals[12]);
         boolean collab = Boolean.parseBoolean(vals[13]);*/
         String gender = vals[3];
+        double exp = Double.parseDouble(vals[4]);
         String wantsGender = "";
-        if (vals.length > 9) {      // REMEMBER: if it's the 10th col, vals.length > 9, then access vals[9]
-            wantsGender = vals[9];
+        if (vals.length > 10) {      // REMEMBER: if it's the 10th col, vals.length > 9, then access vals[9]
+            wantsGender = vals[10];
         }
-        Student s = new Student(id, fn, ln, fn, 10, false, true, true, true, true, gender, wantsGender);
+        Student s = new Student(id, fn, ln, fn, exp, false, true, true, true, true, gender, wantsGender);
         return s;
     }
 

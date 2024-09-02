@@ -6,20 +6,26 @@ public class Group {
     private static final double[] PENALTY_LEVEL = {4, 16, 16*4, 16*16};
     private static final int LEFT = 0;
     private static final int RIGHT = 1;
-    private static final double SKILL_DIFF_THRESHOLD = 2;
+    private static final double SKILL_DIFF_THRESHOLD = 15;
     private static int nextId = 1;
     private int id;
     private Student[] seats;
     private boolean[] frozen;
+    private double[] individualPenalties;
 
     private int groupSize;
     private SeatingChart chart;
+
+    private double penalty = 0;
+    private boolean penaltyDirty = true;
 
     public Group(Group toCopy) {
         this.groupSize = toCopy.groupSize;
         this.chart = toCopy.chart;
         this.id = toCopy.id;
         this.seats = new Student[toCopy.groupSize];
+        this.individualPenalties = new double[toCopy.groupSize];
+
         for (int i = 0; i < seats.length; i++) {
             seats[i] = toCopy.seats[i];
         }
@@ -27,12 +33,18 @@ public class Group {
         for (int i = 0; i < groupSize; i++) {
             frozen[i] = toCopy.frozen[i];
         }
+        for (int i = 0; i < groupSize; i++) {
+            individualPenalties[i] = toCopy.individualPenalties[i];
+        }
+        this.penaltyDirty = toCopy.penaltyDirty;
+        this.penalty = toCopy.penalty;
     }
 
     public Group(SeatingChart chart, Student... students) {
         this.id = nextId++;
         this.chart = chart;
         this.groupSize = students.length;
+        this.individualPenalties = new double[groupSize];
         seats = Arrays.copyOf(students, students.length);
         frozen = new boolean[seats.length];
     }
@@ -60,6 +72,7 @@ public class Group {
         this.id = nextId++;
         seats = new Student[groupSize];
         frozen = new boolean[groupSize];
+        individualPenalties = new double[groupSize];
 
         for (int i = 1; i < vals.length; i++) {
             Student s = getStudentWith(vals[i], students);
@@ -102,12 +115,16 @@ public class Group {
         }
         Student removed = seats[position];
         seats[position] = student;
+
+        this.penaltyDirty  = true;
         return removed;
     }
 
     public Student remove(int position) {
         Student removed = seats[position];
         seats[position] = null;
+
+        this.penaltyDirty  = true;
         return removed;
     }
 
@@ -176,6 +193,7 @@ public class Group {
             if (!frozen[i] && seats[i] != null) {
                 cleared.add(seats[i]);
                 seats[i] = null;
+                this.penaltyDirty  = true;
             }
         }
         return cleared;
@@ -196,6 +214,7 @@ public class Group {
         if (isEmpty(position)) return;
         if (chart == null) return;
         chart.deleteStudent(get(position));
+        this.penaltyDirty  = true;
         chart.consolodate();
     }
 
@@ -207,12 +226,29 @@ public class Group {
         delete(RIGHT);
     }
 
+    public double getPenaltyForStudent(int position) {
+        if (this.penaltyDirty) {
+            this.penalty = calculatePenalty();
+            this.penaltyDirty = false;
+        }
+
+        return this.individualPenalties[position];
+    }
+
     public double getPenalty() {
+        if (this.penaltyDirty) {
+            this.penalty = calculatePenalty();
+            this.penaltyDirty = false;
+        }
+        return this.penalty;
+    }
+
+    private double calculatePenalty() {
         double penalty = 0;
 
         penalty += getRepeatedPartnerPentalty();
         //penalty += getAffinityGroupPenalty();
-        //penalty += getSkillMismatchPenalty();
+        penalty += getSkillMismatchPenalty();
 
         return penalty;
     }
@@ -274,6 +310,7 @@ public class Group {
         for (int position = 0; position < seats.length; position++) {
             if (seats[position] == null) {
                 seats[position] = s;
+                this.penaltyDirty  = true;
                 return true;
             }
         }

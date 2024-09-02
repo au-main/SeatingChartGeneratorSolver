@@ -1,12 +1,9 @@
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import processing.core.PApplet;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
 /*
 TODO: bug: if some charts have 2 per group and some 3, display doesn't change as we arrow through them
@@ -16,7 +13,7 @@ TODO: make color-coding for attainment (or other marking) so I can print and me/
 
 public class Main extends PApplet {
     private String BASE_PATH = "DataFiles/";
-    private String file = "block6-2024.csv";
+    private String file = "block7-2024.csv";
 
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
@@ -77,7 +74,7 @@ public class Main extends PApplet {
 
         chart.assignRandomly();
         displayList = makeDisplayListFor(chart);
-        currentScore = chart.getScore();
+        currentScore = chart.getPenalty();
     }
 
     private ArrayList<DisplayBox> makeDisplayListFor(SeatingChart chart) {
@@ -231,7 +228,7 @@ public class Main extends PApplet {
             String nextChartName = basename + "-" + String.format("%02d", currentChartIndex) + ".csv";
             chart.loadSeatingChartFromFile(BASE_PATH + nextChartName);
             displayList = makeDisplayListFor(chart);
-            currentScore = chart.getScore();                            // TODO: clean up having to remember to makeDisplayLIst For
+            currentScore = chart.getPenalty();                            // TODO: clean up having to remember to makeDisplayLIst For
             // make more helper methods to make this cleaner
         }
 
@@ -246,7 +243,7 @@ public class Main extends PApplet {
             String nextChartName = basename + "-" + String.format("%02d", currentChartIndex) + ".csv";
             chart.loadSeatingChartFromFile(BASE_PATH + nextChartName);
             displayList = makeDisplayListFor(chart);
-            currentScore = chart.getScore();
+            currentScore = chart.getPenalty();
         }
 
         if (key == 'f' || key == 'F') {
@@ -273,7 +270,7 @@ public class Main extends PApplet {
 
         if (key == 'r' || key == 'R') {
             reshuffle();
-            currentScore = chart.getScore();
+            currentScore = chart.getPenalty();
             currentChartIndex = -1;
         }
 
@@ -285,7 +282,7 @@ public class Main extends PApplet {
             SeatingChart best = randomSearchForBestChart(NUM_TO_SEARCH);
             chart = best;
             displayList = makeDisplayListFor(chart);
-            currentScore = chart.getScore();
+            currentScore = chart.getPenalty();
             currentChartIndex = -1;
         }
 
@@ -316,6 +313,25 @@ public class Main extends PApplet {
         return null;
     }
 
+    private SeatingChart randomSwapHighestViolator(int numToSearch, int numHighestToSwap) {
+        System.out.println("Finding a good chart.  Searching " + numToSearch + " possibilities.");
+        double minScore = Double.MAX_VALUE;
+        SeatingChart bestChart = null;
+
+        for (int i = 0; i < numToSearch; i++) {
+            chart.reAssignWorstOffenders(numHighestToSwap);
+            double score = chart.getPenalty();
+            if (score < minScore) {
+                minScore = score;
+                System.out.println("On chart " + i + " found new best with score " + minScore);
+                bestChart = new SeatingChart(chart);
+                if (minScore == 0) return bestChart;
+            }
+        }
+
+        System.out.println("Done.  Best chart has score: " + bestChart.getPenalty());
+        return bestChart;
+    }
 
     private SeatingChart randomSearchForBestChart(int numToSearch) {
         System.out.println("Finding a good chart.  Searching " + numToSearch + " possibilities.");
@@ -323,19 +339,17 @@ public class Main extends PApplet {
         SeatingChart bestChart = null;
 
         for (int i = 0; i < numToSearch; i++) {
-            if (i % 10000 == 0) {
-                System.out.println("Searched " + i + " / " + numToSearch + " charts.");
-            }
             chart.assignRandomly();
-            double score = chart.getScore();
+            double score = chart.getPenalty();
             if (score < minScore) {
                 minScore = score;
+                System.out.println("On chart " + i + " found new best with score " + minScore);
                 bestChart = new SeatingChart(chart);
                 if (minScore == 0) return bestChart;
             }
         }
 
-        System.out.println("Done.  Best chart has score: " + bestChart.getScore());
+        System.out.println("Done.  Best chart has score: " + bestChart.getPenalty());
         return bestChart;
     }
 
