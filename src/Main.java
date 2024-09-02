@@ -12,6 +12,8 @@ TODO: make color-coding for attainment (or other marking) so I can print and me/
  */
 
 public class Main extends PApplet {
+    private ControlWindow controlWindow;
+
     private String BASE_PATH = "DataFiles/";
     private String file = "block7-2024.csv";
 
@@ -48,6 +50,8 @@ public class Main extends PApplet {
     }
 
     public void setup() {
+        controlWindow = new ControlWindow();
+
         textSize(TEXT_SIZE);
         float strAscent = textAscent();
         float strDescent = textDescent();
