@@ -40,10 +40,7 @@ public class Main extends PApplet {
     private double currentScore = -1;
     private int currentChartIndex = -1;
     private int maxChartIndex = -1;
-
     private int[] draggingSeat = null;    // { group index, row-within-group, col-within-group }
-    private boolean displayGroupNums = true;
-    private boolean horizontallyReflect = false;
 
     public void settings() {
         size(1200, 1000);
@@ -160,9 +157,9 @@ public class Main extends PApplet {
 
         int i = 1;
         for (DisplayBox box : displayList) {
-            box.draw(this, displayConflicts, true, horizontallyReflect);
-            if (displayMode == ROOM_LAYOUT && displayGroupNums) {
-                box.drawGroupNumber(i, this, horizontallyReflect);
+            box.draw(this, displayConflicts, true, isOn("mirror"));
+            if (displayMode == ROOM_LAYOUT && isOn("group numbers")) {
+                box.drawGroupNumber(i, this, isOn("mirror"));
             }
             i++;
 
@@ -197,12 +194,33 @@ public class Main extends PApplet {
 
         textAlign(RIGHT);
         text(file.substring(0, file.indexOf(".")), width - 100, height - 40);
-        if (horizontallyReflect) {
+        if (isOn("mirror")) {
             textAlign(LEFT);
             textSize(10);
             text("printed", width - 200, height - 20);
         }
     }
+
+    private boolean isOn(String switchName) {
+        ToggleSwitch s = ControlWindow.switches.get(switchName);
+        if (s == null) {
+            System.err.println("no such setting: " + switchName);
+            return false;
+        }
+
+        return s.isOn();
+    }
+
+    private void toggle(String switchName) {
+        ToggleSwitch s = ControlWindow.switches.get(switchName);
+        if (s == null) {
+            System.err.println("no such setting: " + switchName);
+            return;
+        }
+
+        s.toggle();
+    }
+
 
     private void drawColHeaders() {
         fill(0);
@@ -259,7 +277,7 @@ public class Main extends PApplet {
         }
 
         if (key == 'p' || key == 'P') {
-            horizontallyReflect = !horizontallyReflect;
+            toggle("mirror");
         }
 
         if (key == 'c' || key == 'C') {
@@ -279,7 +297,7 @@ public class Main extends PApplet {
         }
 
         if (key == 't' || key == 'T') {
-            displayGroupNums = !displayGroupNums;
+            ControlWindow.switches.get("group numbers").toggle();
         }
 
         if (key == 'o' || key == 'O') {
@@ -299,6 +317,7 @@ public class Main extends PApplet {
             currentSelectionIndex++;
         }
     }
+
 
     public void mousePressed() {
         draggingSeat = getSeatAt(mouseX, mouseY, displayList);
