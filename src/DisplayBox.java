@@ -140,8 +140,6 @@ public class DisplayBox {
                 position++;
             }
         }
-
-
     }
 
     public void draw(PApplet window) {
@@ -176,6 +174,10 @@ public class DisplayBox {
 
     public String getName(int position) {
         return (this.desk.get(position) != null) ? this.desk.get(position).getDisplayName() : " no one";
+    }
+
+    public String getExperience(int position) {
+        return (this.desk.get(position) != null) ? ""+this.desk.get(position).getExperienceLevel() : "";
     }
 
     public boolean isMouseOver(int mousex, int mousey) {
@@ -271,13 +273,42 @@ public class DisplayBox {
         }
     }
 
-    public void drawGroupNumber(int i, PApplet window, boolean horizontallyReflect) {
+    public void drawGroupNumber(int i, PApplet window, boolean mirror) {
         window.textSize(50);
         window.textAlign(window.CENTER, window.CENTER);
-        if (horizontallyReflect) {
+        if (mirror) {
             window.text("" + i, window.width - (x + w / 2.0f), y - h / 3.0f);
         } else {
             window.text("" + i, x + w / 2.0f, y - h / 3.0f);
+        }
+    }
+
+    public void drawExperienceLevel(PApplet window, boolean mirror) {   // TODO: clean this up.  copied from draw()
+        window.fill(0);
+        window.textAlign(window.LEFT, window.TOP);
+
+        int position = 0;
+        float colWidth = (float)(w / (double) cols);
+        float rowHeight = (float)((h / (double) rows));
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                int deskX = (int) (x + col * colWidth);
+                int deskY = (int) (y + row * rowHeight);
+
+                if (mirror) {
+                    deskX = (int)(window.width - deskX);
+                }
+
+                String name = getExperience(position);
+
+                if (mirror) {
+                    window.text(name, deskX - colWidth, deskY + rowHeight/2);
+                } else {
+                    window.text(name, deskX, deskY + rowHeight/2);
+                }
+                position++;
+            }
         }
     }
 }

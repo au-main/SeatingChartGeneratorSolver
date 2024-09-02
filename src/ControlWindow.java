@@ -15,16 +15,18 @@ public class ControlWindow extends PApplet {
     }
 
     public void settings() {
-        size(300, 600);
+        size(400, 600);
     }
 
     public void setup() {
-        switches.put("group numbers", new ToggleSwitch(new PVector(LEFT_MARGIN, 4*MARGIN)).setText("display group numbers"));
-        switches.put("mirror", new ToggleSwitch(new PVector(LEFT_MARGIN, 5*MARGIN + ToggleSwitch.h*2)).setText("mirror for printing"));
+        switches.put("group numbers", new ToggleSwitch(new PVector(LEFT_MARGIN, 4*MARGIN)).setText("display group (n)umbers"));
+        switches.put("mirror", new ToggleSwitch(new PVector(LEFT_MARGIN, 4*MARGIN + ToggleSwitch.h*2)).setText("mirror for (p)rinting"));
+        switches.put("display conflicts", new ToggleSwitch(new PVector(LEFT_MARGIN, 4*MARGIN + ToggleSwitch.h*4)).setText("display (c)onflicts"));
+        switches.put("exp level", new ToggleSwitch(new PVector(LEFT_MARGIN, 4*MARGIN + ToggleSwitch.h*6)).setText("display (e)xperience level"));
     }
 
     public void draw() {
-        textSize(14);
+        textSize(24);
 
         for( ToggleSwitch s : switches.values() ) {
             s.draw(this);
@@ -37,5 +39,9 @@ public class ControlWindow extends PApplet {
         for( ToggleSwitch s : switches.values() ) {
             s.handleClick(mouseX, mouseY);
         }
+    }
+
+    public void keyReleased() {
+
     }
 }

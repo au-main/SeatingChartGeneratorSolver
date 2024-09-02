@@ -36,7 +36,6 @@ public class Main extends PApplet {
     int columnWidth;
 
     int displayMode = ROOM_LAYOUT;
-    private boolean displayConflicts = false;
     private double currentScore = -1;
     private int currentChartIndex = -1;
     private int maxChartIndex = -1;
@@ -157,9 +156,12 @@ public class Main extends PApplet {
 
         int i = 1;
         for (DisplayBox box : displayList) {
-            box.draw(this, displayConflicts, true, isOn("mirror"));
+            box.draw(this, isOn("display conflicts"), true, isOn("mirror"));
             if (displayMode == ROOM_LAYOUT && isOn("group numbers")) {
                 box.drawGroupNumber(i, this, isOn("mirror"));
+            }
+            if (displayMode == ROOM_LAYOUT && isOn("exp level")) {
+                box.drawExperienceLevel(this, isOn("mirror"));
             }
             i++;
 
@@ -221,7 +223,6 @@ public class Main extends PApplet {
         s.toggle();
     }
 
-
     private void drawColHeaders() {
         fill(0);
         stroke(0);
@@ -281,8 +282,8 @@ public class Main extends PApplet {
         }
 
         if (key == 'c' || key == 'C') {
-            displayConflicts = !displayConflicts;
-            System.out.println("Display conflicts: " + displayConflicts);
+            toggle("display conflicts");
+            System.out.println("Display conflicts: " + isOn("display conflicts"));
         }
 
         if (key == 'm' || key == 'M') {
@@ -296,8 +297,8 @@ public class Main extends PApplet {
             currentChartIndex = -1;
         }
 
-        if (key == 't' || key == 'T') {
-            ControlWindow.switches.get("group numbers").toggle();
+        if (key == 'n' || key == 'N') {
+            toggle("group numbers");
         }
 
         if (key == 'o' || key == 'O') {
