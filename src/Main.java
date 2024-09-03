@@ -15,7 +15,7 @@ public class Main extends PApplet {
     private ControlWindow controlWindow;
 
     private String BASE_PATH = "DataFiles/";
-    private String file = "block3-2024.csv";
+    private String file = "block4-2024.csv";
 
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
@@ -289,6 +289,10 @@ public class Main extends PApplet {
         if (key == 'm' || key == 'M') {
             displayMode = (displayMode == LIST_LAYOUT) ? ROOM_LAYOUT : LIST_LAYOUT;
             displayList = makeDisplayListFor(chart);
+        }
+
+        if (key == 'e' || key == 'E') {
+            toggle("exp level");
         }
 
         if (key == 'r' || key == 'R') {

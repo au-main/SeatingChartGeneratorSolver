@@ -299,7 +299,7 @@ public class DisplayBox {
     public void drawExperienceLevel(PApplet window, boolean mirror) {   // TODO: clean this up.  copied from draw()
         window.fill(0);
         window.textAlign(window.LEFT, window.TOP);
-
+        window.textSize(20);    // TODO: no hardcode!
         int position = 0;
         float colWidth = (float)(w / (double) cols);
         float rowHeight = (float)((h / (double) rows));
