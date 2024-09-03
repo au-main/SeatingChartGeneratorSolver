@@ -15,7 +15,7 @@ public class Main extends PApplet {
     private ControlWindow controlWindow;
 
     private String BASE_PATH = "DataFiles/";
-    private String file = "block7-2024.csv";
+    private String file = "block3-2024.csv";
 
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;

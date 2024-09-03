@@ -177,7 +177,20 @@ public class DisplayBox {
     }
 
     public String getExperience(int position) {
-        return (this.desk.get(position) != null) ? ""+this.desk.get(position).getExperienceLevel() : "";
+        Student student = this.desk.get(position);
+        if (student == null) return "";
+
+        double exp = student.getExperienceLevel();
+        return " " + displayExpStringFor(exp);
+    }
+
+    private String displayExpStringFor(double exp) {
+        if (exp > 85) return "Adv";
+        if (exp > 80) return "Mid+";
+        if (exp > 60) return "Mid";
+        if (exp > 55) return "Beg+";
+        if (exp > 45) return "Beg";
+        return "Beg-";
     }
 
     public boolean isMouseOver(int mousex, int mousey) {
