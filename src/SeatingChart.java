@@ -367,4 +367,9 @@ public class SeatingChart {
         }
         return null;
     }
+
+    public void clear() {
+        groups.clear();
+        students.clear();
+    }
 }

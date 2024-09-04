@@ -15,7 +15,7 @@ public class Main extends PApplet {
     private ControlWindow controlWindow;
 
     private String BASE_PATH = "DataFiles/";
-    private String file = "block4-2024.csv";
+    private String file = "block7-2024.csv";
 
     private static final float TEXT_SIZE = 32;
     private static final int TOP_BUFF = 80;
@@ -55,8 +55,15 @@ public class Main extends PApplet {
         boxHeight = textHeight + verticalBuffer;
         numNamesPerCol = (int) (studentsPerGroup * (height - TOP_BUFF) / boxHeight);
 
+        loadFile(BASE_PATH, file);
+    }
+
+    private void loadFile(String base_path, String file) {
+        this.chart.clear();
+
         try {
-            ArrayList<Student> studentData = loadStudents(BASE_PATH + file);
+            ArrayList<Student> studentData = loadStudents(base_path + file);
+            System.out.println("Loaded " + studentData.size() + " students.");
             Student.fixDisplayNames(studentData);
 
             chart.addStudents(studentData);
@@ -75,6 +82,8 @@ public class Main extends PApplet {
         chart.assignRandomly();
         displayList = makeDisplayListFor(chart);
         currentScore = chart.getPenalty();
+        maxChartIndex = -1;
+        currentChartIndex = -1;
     }
 
     private ArrayList<DisplayBox> makeDisplayListFor(SeatingChart chart) {
@@ -320,6 +329,22 @@ public class Main extends PApplet {
             maxChartIndex++;
             System.out.println("Max chart index now: "+ maxChartIndex);
             currentSelectionIndex++;
+        }
+
+        if (key == '2') {
+            loadFile(BASE_PATH, "block2-2024.csv");
+        }
+        if (key == '3') {
+            loadFile(BASE_PATH, "block3-2024.csv");
+        }
+        if (key == '4') {
+            loadFile(BASE_PATH, "block4-2024.csv");
+        }
+        if (key == '6') {
+            loadFile(BASE_PATH, "block6-2024.csv");
+        }
+        if (key == '7') {
+            loadFile(BASE_PATH, "block7-2024.csv");
         }
     }
 
