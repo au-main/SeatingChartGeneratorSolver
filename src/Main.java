@@ -60,6 +60,7 @@ public class Main extends PApplet {
 
     private void loadFile(String base_path, String file) {
         this.chart.clear();
+        this.file = file;       // hackhackhack =(
 
         try {
             ArrayList<Student> studentData = loadStudents(base_path + file);
