@@ -73,8 +73,10 @@ public class Main extends PApplet {
             String baseFileName = file.substring(0, file.indexOf("."));
             String nextNum = SeatingChart.getNumForNextSequentialFilename(BASE_PATH, baseFileName);
             this.maxChartIndex = Integer.parseInt(nextNum) - 1;
+            System.out.println("Max chart index is: " + maxChartIndex);
         } catch (IOException e) {
             System.err.println("Couldn't read the file: " + file);
+            maxChartIndex = -1;
         }
 
         numColumns = (int) (chart.getStudents().size() / numNamesPerCol) + 1;
@@ -83,7 +85,6 @@ public class Main extends PApplet {
         chart.assignRandomly();
         displayList = makeDisplayListFor(chart);
         currentScore = chart.getPenalty();
-        maxChartIndex = -1;
         currentChartIndex = -1;
     }
 
