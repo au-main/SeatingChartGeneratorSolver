@@ -175,10 +175,6 @@ public class Main extends PApplet {
                 box.drawExperienceLevel(this, isOn("mirror"));
             }
             i++;
-
-/*            if (box.isMouseOver(mouseX, mouseY)) {
-                box.highlight(this, color(0, 255, 0));
-            }*/
         }
         textSize(TEXT_SIZE);
 
@@ -205,8 +201,10 @@ public class Main extends PApplet {
             text("Chart " + (currentChartIndex+1) + " of " + (maxChartIndex + 1), width / 2, height - 40);
         }
 
-        textAlign(RIGHT);
-        text(file.substring(0, file.indexOf(".")), width - 100, height - 40);
+        // Display block number in upper left
+        textAlign(LEFT);
+        text(file.substring(0, file.indexOf(".")-5), 20, 30);
+
         if (isOn("mirror")) {
             textAlign(LEFT);
             textSize(10);
