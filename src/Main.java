@@ -313,6 +313,10 @@ public class Main extends PApplet {
         if (key == 'n' || key == 'N') {
             toggle("group numbers");
         }
+        
+        if (key == 'h' || key == 'H') {
+            toggle("hide errors");
+        }
 
         if (key == 'o' || key == 'O') {
             SeatingChart best = randomSearchForBestChart(NUM_TO_SEARCH);
