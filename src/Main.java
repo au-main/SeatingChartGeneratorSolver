@@ -318,12 +318,27 @@ public class Main extends PApplet {
             toggle("hide errors");
         }
 
+        if (key == 'j' || key == 'J') {
+            long millisStart = System.currentTimeMillis();
+            chart.assignStudentsEfficiently();
+            displayList = makeDisplayListFor(chart);
+            currentScore = chart.getPenalty();
+            currentChartIndex = -1;
+            if(isOn("show sorting time")) {
+                System.out.println("time to sort:" + (System.currentTimeMillis() - millisStart));
+            }
+        }
+        
         if (key == 'o' || key == 'O') {
+            long millisStart = System.currentTimeMillis();
             SeatingChart best = randomSearchForBestChart(NUM_TO_SEARCH);
             chart = best;
             displayList = makeDisplayListFor(chart);
             currentScore = chart.getPenalty();
             currentChartIndex = -1;
+            if(isOn("show sorting time")) {
+                System.out.println("time to sort:" + (System.currentTimeMillis() - millisStart));
+            }
         }
 
         if (key == 'u' || key == 'U') {     // USE
